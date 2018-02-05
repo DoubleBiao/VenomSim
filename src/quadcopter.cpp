@@ -56,7 +56,7 @@ class quadcopter::quadcopterImpl
 		bool startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw);
 
 		void dosimulating( QS_TIMER_TIME_TYPE period);
-		void getcommands(char roll, char pitch, char yaw, char throttle);
+		void getcommands(double roll, double pitch, double yaw, double throttle);
 
 		// source: http://eigen.tuxfamily.org/dox-devel/group__TopicStructHavingEigenMembers.html
 		EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -163,7 +163,7 @@ class quadcopter::quadcopterImpl
 		void attitute_height_estimation_before_takeoff();
 
 		// functions to use the subelements
-		void read_receiver(char roll, char pitch, char yaw, char throttle);
+		void read_receiver(double roll, double pitch, double yaw, double throttle);
 		void read_sensors();
 		void read_sensorFusion();
 		void read_controller();
@@ -418,7 +418,7 @@ void quadcopter::quadcopterImpl::attitute_height_estimation_before_takeoff()
 	this->heightdotdot_ef_sensor_fusion = sf.getHeightDotDot();
 }
 
-void quadcopter::quadcopterImpl::read_receiver(char roll, char pitch, char yaw, char throttle)
+void quadcopter::quadcopterImpl::read_receiver(double roll, double pitch, double yaw, double throttle)
 {
 	this->receiv.get_desired_throttle(this->throttle_user,throttle);
 	this->receiv.get_desired_theta(this->theta_user,roll,pitch,yaw);
@@ -458,15 +458,15 @@ void quadcopter::quadcopterImpl::read_sensorFusion(void)
 void quadcopter::quadcopterImpl::read_controller()
 {	
 	this->stabi.compute_pwmDutyCycle(	&(this->pwmDutyCycle),
-										this->theta_ef_sensor_fusion,			// attitude
-										this->thetadot_ef_sensor_fusion,		// angular velocity
-										this->height_ef_sensor_fusion,			// height
-										this->heightdot_ef_sensor_fusion,		// vertical speed
-										this->heightdotdot_ef_sensor_fusion,	// vertical acceleration
-										this->theta_user(0),					// user roll
-										this->theta_user(1),					// user pitch
-										this->theta_user(2),					// user yaw
-										this->throttle_user);					// user thrust
+						this->theta_ef_sensor_fusion,			// attitude
+						this->thetadot_ef_sensor_fusion,		// angular velocity
+						this->height_ef_sensor_fusion,			// height
+						this->heightdot_ef_sensor_fusion,		// vertical speed
+						this->heightdotdot_ef_sensor_fusion,	// vertical acceleration
+						this->theta_user(0),					// user roll
+						this->theta_user(1),					// user pitch
+						this->theta_user(2),					// user yaw
+						this->throttle_user);					// user thrust
 }
 
 void quadcopter::quadcopterImpl::solve_diff_equation(QS_TIMER_TIME_TYPE time_delta_simulation, QS_TIMER_TIME_TYPE period)
@@ -532,7 +532,7 @@ void quadcopter::quadcopterImpl::dosimulating( QS_TIMER_TIME_TYPE period)
 	this->solve_diff_equation(QS_TIME_DELTA, period);
 }
 
-void quadcopter::quadcopterImpl::getcommands(char roll, char pitch, char yaw, char throttle)
+void quadcopter::quadcopterImpl::getcommands(double roll, double pitch, double yaw, double throttle)
 {
 	this->read_receiver(roll, pitch, yaw, throttle);
 	this->read_sensors();
@@ -608,7 +608,7 @@ void quadcopter::dosimulating( QS_TIMER_TIME_TYPE period)
 	this->qcimpl->dosimulating(period);
 }
 
-void quadcopter::getcommands(char roll, char pitch, char yaw, char throttle)
+void quadcopter::getcommands(double roll, double pitch, double yaw, double throttle)
 {
 	this->qcimpl->getcommands(roll, pitch, yaw, throttle);
 }

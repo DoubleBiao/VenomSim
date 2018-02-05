@@ -34,61 +34,27 @@ receiver::~receiver()
 {
 }
 
-void receiver::get_desired_theta(Vector3d &theta_d,char _roll,char _pitch, char _yaw)
+void receiver::get_desired_theta(Vector3d &theta_d,double _roll,double _pitch, double _yaw)
 {
-
-
 	// zero signals in case no input or blocked
 	theta_d(0) = RECEIVER_PWM_ZERO_SIGNAL;
 	theta_d(1) = RECEIVER_PWM_ZERO_SIGNAL;
 	theta_d(2) = RECEIVER_PWM_ZERO_SIGNAL;
 
-	// only roll and pitch
-	if(this->output_blocked == false)
-	{
-		// roll (A and D)
-		if(_roll == '+')
-			theta_d(0) -= this->roll_pwm;
-		else if(_roll == '-')
-			theta_d(0) += this->roll_pwm;
-
-		// pitch (W and S)
-		if(_pitch == '+')
-			theta_d(1) += this->pitch_pwm;
-		else if(_pitch == '-')
-			theta_d(1) -= this->pitch_pwm;
-
-		// yaw (Q and E)
-		if(_yaw == '+')
-			theta_d(2) -= this->yaw_pwm;
-		else if(_yaw == '-')
-			theta_d(2) += this->yaw_pwm;
-	}
-
-	theta_d(0) = constrainn<double>(theta_d(0), RECEIVER_PWM_MIN, RECEIVER_PWM_MAX);
-	theta_d(1) = constrainn<double>(theta_d(1), RECEIVER_PWM_MIN, RECEIVER_PWM_MAX);
-	theta_d(2) = constrainn<double>(theta_d(2), RECEIVER_PWM_MIN, RECEIVER_PWM_MAX);
+	theta_d(0) += mapp<double>(_roll, ROLL_MIN,ROLL_MAX,RECEIVER_PWM_MIN - (RECEIVER_PWM_MIN + RECEIVER_PWM_MAX)/2, RECEIVER_PWM_MAX - (RECEIVER_PWM_MIN + RECEIVER_PWM_MAX)/2);
+	theta_d(1) += mapp<double>(_pitch,PITCH_MIN,PITCH_MAX,RECEIVER_PWM_MIN - (RECEIVER_PWM_MIN + RECEIVER_PWM_MAX)/2, RECEIVER_PWM_MAX - (RECEIVER_PWM_MIN + RECEIVER_PWM_MAX)/2);
+	theta_d(2) += mapp<double>(_yaw,  YAW_MIN,YAW_MAX,RECEIVER_PWM_MIN - (RECEIVER_PWM_MIN + RECEIVER_PWM_MAX)/2, RECEIVER_PWM_MAX - (RECEIVER_PWM_MIN + RECEIVER_PWM_MAX)/2);
 
 }
 
-void receiver::get_desired_throttle(double &throttle,char _throttle)
+void receiver::get_desired_throttle(double &throttle,double _throttle)
 {	
-
-		// user has to put stick in hover position if he does not want to climb/sink
+	// user has to put stick in hover position if he does not want to climb/sink	
 	throttle = getPWMinPointOfEquilibirum();
 
-	// if block demand normal position
-	if(this->output_blocked == false)
-	{
-		// climb (+)
-		if(_throttle == '+')
-			throttle += this->throttle_pwm;
-		// sink (-)
-		else if(_throttle == '-')
-			throttle -= this->throttle_pwm;
-	}
+	//to make sure that the drone remain stable we input throttle is 0
+	throttle += mapp<double>(_throttle,-1,1,RECEIVER_PWM_MIN - (RECEIVER_PWM_MIN + RECEIVER_PWM_MAX)/2,RECEIVER_PWM_MAX - (RECEIVER_PWM_MIN + RECEIVER_PWM_MAX)/2);
 
-	throttle = constrainn<double>(throttle, RECEIVER_PWM_MIN, RECEIVER_PWM_MAX);
 
 }
 

@@ -10,7 +10,7 @@ SRCS = accelerometer.cpp barometer.cpp complementaryFilter.cpp esc_motor.cpp gyr
 
 OBJS = $(SRCS:.c=.o)
 
-MAIN = ../build/dronesim.so
+MAIN = ../build/drone_sim.so
 
 .PHONY: depend clean
 

@@ -48,8 +48,8 @@ extern "C" void siminit(double initx, double inity, double initz, double initrol
 
 
 //getcommand interface
-extern "C" void simcontrol(char roll, char pitch, char yaw, char throttle,
-												char roll_t, char pitch_t, char yaw_t, char throttle_t)
+extern "C" void simcontrol(double roll,double pitch, double yaw, double throttle,
+			   double roll_t, double pitch_t, double yaw_t, double throttle_t)
 {
 	Quadcopter_sim->getcommands(roll,pitch,yaw,throttle);
 

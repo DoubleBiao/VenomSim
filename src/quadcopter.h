@@ -43,7 +43,7 @@ class quadcopter
 		bool startSimulation(double initx, double inity, double initz, double initraw, double initpitch, double inityaw);
 		
 		void dosimulating( QS_TIMER_TIME_TYPE period);
-		void getcommands(char roll, char pitch, char yaw, char throttle);
+		void getcommands(double roll, double pitch, double yaw, double throttle);
 	private:
 
 		// implementation class

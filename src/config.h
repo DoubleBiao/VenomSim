@@ -203,7 +203,15 @@ inline double getPWMinPointOfEquilibirum()
 #define RECEIVER_YAW_KEY_PWM			250.0
 #define RECEIVER_THROTTLE_KEY_PWM		100.0
 
-
+//Xiaotian : zixi's code needs contineous action space. The action controllers sent was normalized into (-1,1)
+#define ROLL_MIN -1
+#define ROLL_MAX 1
+#define PITCH_MIN -1
+#define PITCH_MAX 1
+#define YAW_MIN -1
+#define YAW_MAX 1
+#define THRUST_MIN -1
+#define THRUST_MAX 1
 
 //======================================================================
 //===================== SENSORS ========================================

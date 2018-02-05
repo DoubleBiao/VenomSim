@@ -30,10 +30,10 @@ class receiver
 		~receiver();
 		
 		// in radians
-		void get_desired_theta(Vector3d &theta_d,char roll, char pitch, char yaw);
+		void get_desired_theta(Vector3d &theta_d,double roll, double pitch, double yaw);
 
 		// in meter per second
-		void get_desired_throttle(double &throttle,char _throttle);
+		void get_desired_throttle(double &throttle,double _throttle);
 
 		// always return zero
 		void block_receiver(bool blocked);
