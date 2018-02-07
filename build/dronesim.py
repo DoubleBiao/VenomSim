@@ -90,79 +90,79 @@ def cmdfromkeyboard():
 
 
 ##############test#######################
-#if __name__ == "__main__":
-#    import animation as ani
-#    import numpy as np
-#    from scipy import linalg as la
-#    import matplotlib.pyplot as pl
-#    import time
-#
-#
-#    def Rot_bn(phi,theta,psi):
-#        cphi = np.cos(phi)
-#        sphi = np.sin(phi)
-#        cthe = np.cos(theta)
-#        sthe = np.sin(theta)
-#        cpsi = np.cos(psi)
-#        spsi = np.sin(psi)
-#
-#        Rx = np.array([[1,    0,      0], \
-#                       [0,  cphi,  sphi], \
-#                       [0, -sphi,  cphi]])
-#
-#        Ry = np.array([[cthe,  0,  -sthe], \
-#                       [   0,  1,      0], \
-#                       [sthe,  0,   cthe]])
-#
-#        Rz = np.array([[ cpsi,  spsi, 0], \
-#                       [-spsi,  cpsi, 0], \
-#                       [    0,    0, 1]])
-#
-#        R = Rx.dot(Ry).dot(Rz)
-#        return R
-#
-#    #dronesimapi.siminit(1,2,3,4,5,6,
-#    #                    1,2,3,4,5,6)
-#
-#    siminit([1,2,3],[3,4,5],[4,6,5],[1,2,3])
-#    
-#    quadcolor = ['k']
-#    fig = pl.figure(0)
-#    axis3d = fig.add_subplot(111, projection='3d')
-#    pl.figure(0)
-#
-#    it = 0
-#
-#    for t in range(10000):
-#        roll,pitch,yaw,throttle = cmdfromkeyboard()
-#        #print(roll,pitch,yaw,throttle)
-#        #dronesimapi.simcontrol(c_char(roll),c_char(pitch),c_char(yaw),c_char(throttle),c_char(0),c_char(0),c_char(0),c_char(0))
-#        simcontrol([roll,pitch,yaw,throttle])
-#        
-#        #dronesimapi.simrun(c_ulonglong(5000000))
-#        simrun(5000000)
-#        #outinfo = dronesimapi.siminfo()
-#        pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo()
-#        #print("posisiton:",outinfo.contents.posx,outinfo.contents.posy,outinfo.contents.posz)
-#
-#        if it%30 == 0:
-#            axis3d.cla()
-#            ani.draw3d(axis3d,pos_hunter,Rot_bn(ori_hunter[0],ori_hunter[1],ori_hunter[2]), quadcolor[0])
-#            print(thrust)
-#            #ani.draw3d(axis3d,[outinfo.contents.posx_t,outinfo.contents.posy_t,outinfo.contents.posz_t], Rot_bn(outinfo.contents.thetax_t,outinfo.contents.thetay_t,outinfo.contents.thetaz_t), quadcolor[0])
-#            ani.draw3d(axis3d,pos_target, Rot_bn(ori_target[0],ori_target[1],ori_target[2]), quadcolor[0])
-#            axis3d.set_xlim(-10, 10)
-#            axis3d.set_ylim(-10, 10)
-#            axis3d.set_zlim(0, 15)
-#            axis3d.set_xlabel('South [m]')
-#            axis3d.set_ylabel('East [m]')
-#            axis3d.set_zlabel('Up [m]')
-#            pl.pause(0.0001)
-#            pl.draw()
-#            #print("aaa")
-#
-#        it+=1
-#
-#    dronesimapi.simstop()
+if __name__ == "__main__":
+    import animation as ani
+    import numpy as np
+    from scipy import linalg as la
+    import matplotlib.pyplot as pl
+    import time
+
+
+    def Rot_bn(phi,theta,psi):
+        cphi = np.cos(phi)
+        sphi = np.sin(phi)
+        cthe = np.cos(theta)
+        sthe = np.sin(theta)
+        cpsi = np.cos(psi)
+        spsi = np.sin(psi)
+
+        Rx = np.array([[1,    0,      0], \
+                       [0,  cphi,  sphi], \
+                       [0, -sphi,  cphi]])
+
+        Ry = np.array([[cthe,  0,  -sthe], \
+                       [   0,  1,      0], \
+                       [sthe,  0,   cthe]])
+
+        Rz = np.array([[ cpsi,  spsi, 0], \
+                       [-spsi,  cpsi, 0], \
+                       [    0,    0, 1]])
+
+        R = Rx.dot(Ry).dot(Rz)
+        return R
+
+    #dronesimapi.siminit(1,2,3,4,5,6,
+    #                    1,2,3,4,5,6)
+
+    siminit([1,2,3],[3,4,5],[4,6,5],[1,2,3])
+    
+    quadcolor = ['k']
+    fig = pl.figure(0)
+    axis3d = fig.add_subplot(111, projection='3d')
+    pl.figure(0)
+
+    it = 0
+
+    for t in range(10000):
+        roll,pitch,yaw,throttle = cmdfromkeyboard()
+        #print(roll,pitch,yaw,throttle)
+        #dronesimapi.simcontrol(c_char(roll),c_char(pitch),c_char(yaw),c_char(throttle),c_char(0),c_char(0),c_char(0),c_char(0))
+        simcontrol([roll,pitch,yaw,throttle])
+        
+        #dronesimapi.simrun(c_ulonglong(5000000))
+        simrun(5000000)
+        #outinfo = dronesimapi.siminfo()
+        pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo()
+        #print("posisiton:",outinfo.contents.posx,outinfo.contents.posy,outinfo.contents.posz)
+
+        if it%30 == 0:
+            axis3d.cla()
+            ani.draw3d(axis3d,pos_hunter,Rot_bn(ori_hunter[0],ori_hunter[1],ori_hunter[2]), quadcolor[0])
+            print(thrust)
+            #ani.draw3d(axis3d,[outinfo.contents.posx_t,outinfo.contents.posy_t,outinfo.contents.posz_t], Rot_bn(outinfo.contents.thetax_t,outinfo.contents.thetay_t,outinfo.contents.thetaz_t), quadcolor[0])
+            ani.draw3d(axis3d,pos_target, Rot_bn(ori_target[0],ori_target[1],ori_target[2]), quadcolor[0])
+            axis3d.set_xlim(-10, 10)
+            axis3d.set_ylim(-10, 10)
+            axis3d.set_zlim(0, 15)
+            axis3d.set_xlabel('South [m]')
+            axis3d.set_ylabel('East [m]')
+            axis3d.set_zlabel('Up [m]')
+            pl.pause(0.0001)
+            pl.draw()
+            #print("aaa")
+
+        it+=1
+
+    dronesimapi.simstop()
 
 
