@@ -69,8 +69,8 @@ extern "C" void simrun(unsigned long long period)
 extern "C" infoformat * siminfo()
 {
 	outputbuffer->posx = Quadcopter_sim->get_position(0);
-	outputbuffer->posy = Quadcopter_sim->get_position(2);
-	outputbuffer->posz = Quadcopter_sim->get_position(1);
+	outputbuffer->posy = Quadcopter_sim->get_position(1);
+	outputbuffer->posz = Quadcopter_sim->get_position(2);
 
 	outputbuffer->velocityx = Quadcopter_sim->get_speed(0);
 	outputbuffer->velocityy = Quadcopter_sim->get_speed(1);
@@ -85,8 +85,8 @@ extern "C" infoformat * siminfo()
 	outputbuffer->accz = Quadcopter_sim->get_acc(2);
 
 	outputbuffer->posx_t = Quadcopter_target->get_position(0);
-	outputbuffer->posy_t = Quadcopter_target->get_position(2);
-	outputbuffer->posz_t = Quadcopter_target->get_position(1);
+	outputbuffer->posy_t = Quadcopter_target->get_position(1);
+	outputbuffer->posz_t = Quadcopter_target->get_position(2);
 
 	outputbuffer->velocityx_t = Quadcopter_target->get_speed(0);
 	outputbuffer->velocityy_t = Quadcopter_target->get_speed(1);

@@ -422,7 +422,7 @@ void quadcopter::quadcopterImpl::read_receiver(double roll, double pitch, double
 {
 	this->receiv.get_desired_throttle(this->throttle_user,throttle);
 	this->receiv.get_desired_theta(this->theta_user,roll,pitch,yaw);
-	std::cout<<this->throttle_user<<std::endl;
+	//std::cout<<this->throttle_user<<std::endl;
 	//std::cout<<this->theta_user<<std::endl;
 }
 
