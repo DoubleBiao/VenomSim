@@ -15,6 +15,8 @@ class DroneSimEnv(gym.Env):
         '''
         general property
         '''
+
+        self.tmp_pos = np.array([None,None,None,None])
         self.episodes = 0
         self.fps = 120
         self.iteration, self.max_iteration = 0, 30 * self.fps
@@ -85,6 +87,7 @@ class DroneSimEnv(gym.Env):
         self.np_random, seed = seeding.np_random(seed)
         return [seed]
 
+
     def step(self, action):
         roll, pitch, yaw, thrust = action[0], action[1], action[2], action[3]
 
@@ -125,6 +128,7 @@ class DroneSimEnv(gym.Env):
         return self.state, reward, done, {'distance': self.distance}
 
 
+
     def get_state(self):
         position_hunter,orientation_hunter,acc_hunter,position_target,orientation_target,acc_target,thrust_hunter = dronesim.siminfo()
                 
@@ -158,13 +162,18 @@ class DroneSimEnv(gym.Env):
                                 distance_state
                                 ], 0)
 
-
+	
+        
+        
+        if self.tmp_pos.any() != None :
+            tmp_pos = self.tmp_pos
+            print("speed:","x:",position_hunter[0] - tmp_pos[0],"y:",position_hunter[1] - tmp_pos[1],"z:",position_hunter[2] - tmp_pos[2] )
         ###########for debug#####################
         print("hunter pos:",position_hunter)
         print("target pos:",position_target)
         print("project abs pos:",[absolute_x, absolute_y])
         print("porject rel pos:",[relative_x, relative_y])
-
+        self.tmp_pos = position_hunter
         return state
 
 
