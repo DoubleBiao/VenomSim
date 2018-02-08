@@ -69,10 +69,10 @@ def simstop():
     
 ##    
 def cmdfromkeyboard():
-    rolldict = {'a':ord('+'),'d':ord('-')}
-    pitchdict = {'w':ord('+'),'s':ord('-')}
-    yawdict = {'q':ord('+'),'e':ord('-')}
-    throttledict = {'+':ord('+'),'-':ord('-')}
+    rolldict = {'a':-1,'d':1}
+    pitchdict = {'w':-1,'s':1}
+    yawdict = {'q':-1,'e':1}
+    throttledict = {'+':-1,'-':1}
     
     def checkkeyboard(keydict,default_val):
         for key in keydict.keys():
@@ -124,7 +124,7 @@ if __name__ == "__main__":
     #dronesimapi.siminit(1,2,3,4,5,6,
     #                    1,2,3,4,5,6)
 
-    siminit([1,2,3],[3,4,5],[4,6,5],[1,2,3])
+    siminit([1,2,3],[0,0,0],[4,6,5],[0,0,0])
     
     quadcolor = ['k']
     fig = pl.figure(0)
@@ -132,6 +132,8 @@ if __name__ == "__main__":
     pl.figure(0)
 
     it = 0
+
+    last_pos = np.array([None,None,None])
 
     for t in range(10000):
         roll,pitch,yaw,throttle = cmdfromkeyboard()
@@ -145,23 +147,28 @@ if __name__ == "__main__":
         pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo()
         #print("posisiton:",outinfo.contents.posx,outinfo.contents.posy,outinfo.contents.posz)
 
-        if it%30 == 0:
-            axis3d.cla()
-            ani.draw3d(axis3d,pos_hunter,Rot_bn(ori_hunter[0],ori_hunter[1],ori_hunter[2]), quadcolor[0])
-            print(thrust)
-            #ani.draw3d(axis3d,[outinfo.contents.posx_t,outinfo.contents.posy_t,outinfo.contents.posz_t], Rot_bn(outinfo.contents.thetax_t,outinfo.contents.thetay_t,outinfo.contents.thetaz_t), quadcolor[0])
-            ani.draw3d(axis3d,pos_target, Rot_bn(ori_target[0],ori_target[1],ori_target[2]), quadcolor[0])
-            axis3d.set_xlim(-10, 10)
-            axis3d.set_ylim(-10, 10)
-            axis3d.set_zlim(0, 15)
-            axis3d.set_xlabel('South [m]')
-            axis3d.set_ylabel('East [m]')
-            axis3d.set_zlabel('Up [m]')
-            pl.pause(0.0001)
-            pl.draw()
-            #print("aaa")
+##        if it%30 == 0:
+##            axis3d.cla()
+##            ani.draw3d(axis3d,pos_hunter,Rot_bn(ori_hunter[0],ori_hunter[1],ori_hunter[2]), quadcolor[0])
+##            print(thrust)
+##            #ani.draw3d(axis3d,[outinfo.contents.posx_t,outinfo.contents.posy_t,outinfo.contents.posz_t], Rot_bn(outinfo.contents.thetax_t,outinfo.contents.thetay_t,outinfo.contents.thetaz_t), quadcolor[0])
+##            ani.draw3d(axis3d,pos_target, Rot_bn(ori_target[0],ori_target[1],ori_target[2]), quadcolor[0])
+##            axis3d.set_xlim(-10, 10)
+##            axis3d.set_ylim(-10, 10)
+##            axis3d.set_zlim(0, 15)
+##            axis3d.set_xlabel('South [m]')
+##            axis3d.set_ylabel('East [m]')
+##            axis3d.set_zlabel('Up [m]')
+##            pl.pause(0.00001)
+##            pl.draw()
+##            #print("aaa")
 
         it+=1
+        time.sleep(0.1)
+        if last_pos.all()!=None:
+            speed = pos_hunter - last_pos
+            print('x:',speed[0],'y:',speed[1],'z:',speed[2])
+        last_pos = pos_hunter
 
     dronesimapi.simstop()
 

@@ -167,12 +167,6 @@ class DroneSimEnv(gym.Env):
         
         if self.tmp_pos.any() != None :
             tmp_pos = self.tmp_pos
-            print("speed:","x:",position_hunter[0] - tmp_pos[0],"y:",position_hunter[1] - tmp_pos[1],"z:",position_hunter[2] - tmp_pos[2] )
-        ###########for debug#####################
-        print("hunter pos:",position_hunter)
-        print("target pos:",position_target)
-        print("project abs pos:",[absolute_x, absolute_y])
-        print("porject rel pos:",[relative_x, relative_y])
         self.tmp_pos = position_hunter
         return state
 
@@ -220,4 +214,4 @@ class DroneSimEnv(gym.Env):
 ##################for test###############################
 if __name__ == "__main__":
     env = DroneSimEnv()
-    env.step([ord('+'),ord('+'),ord('+'),ord('+')])
+    env.step([1,0,0,1])
