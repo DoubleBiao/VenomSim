@@ -70,7 +70,7 @@ def simstop():
 ##    
 def cmdfromkeyboard():
     rolldict = {'a':-1,'d':1}
-    pitchdict = {'w':-1,'s':1}
+    pitchdict = {'w':1,'s':-1}
     yawdict = {'q':-1,'e':1}
     throttledict = {'+':-1,'-':1}
     
