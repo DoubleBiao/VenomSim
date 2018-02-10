@@ -15,7 +15,7 @@ MAIN = ../build/drone_sim.so
 .PHONY: depend clean
 
 all:    $(MAIN)
-	@drone_sim has been compiled
+	@echo drone_sim has been compiled
 
 $(MAIN): $(OBJS) 
 	$(CC) $(SHARE) $(INCLUDES) -std=c++11 -o $(MAIN) $(OBJS)
