@@ -131,10 +131,18 @@ class DroneSimEnv(gym.Env):
 
     def get_state(self):
         position_hunter,orientation_hunter,acc_hunter,position_target,orientation_target,acc_target,thrust_hunter = dronesim.siminfo()
-                
-        (absolute_x, absolute_y), _ = projection(np.matrix(position_target), np.matrix(position_hunter), np.matrix(orientation_hunter), w=float(self.width), h=float(self.height)) 
-        relative_x, relative_y = absolute_x / self.width, absolute_y / self.height
         
+        # this is a temporary solution for an unkown bug
+	try:
+            (absolute_x, absolute_y), _ = projection(np.matrix(position_target), np.matrix(position_hunter), np.matrix(orientation_hunter), w=float(self.width), h=float(self.height))
+        except ValueError:
+            print("valueerror occured, the parameter:")
+            print("hunter position:",position_hunter)
+            print("hunter oritentation:",orientation_hunter)
+            print("target position:",position_target)
+            raise
+           
+        relative_x, relative_y = absolute_x / self.width, absolute_y / self.height:
         target_coordinate_in_view = np.array((relative_x, relative_y)).flatten()
         
         self.distance = np.linalg.norm(position_hunter - position_target)
