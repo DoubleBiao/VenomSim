@@ -18,7 +18,7 @@ class DroneSimEnv(gym.Env):
 
         self.tmp_pos = np.array([None,None,None,None])
         self.episodes = 0
-        self.fps = 120
+        self.fps = 30
         self.iteration, self.max_iteration = 0, 30 * self.fps
 
         self.width = 256
@@ -133,7 +133,7 @@ class DroneSimEnv(gym.Env):
         position_hunter,orientation_hunter,acc_hunter,position_target,orientation_target,acc_target,thrust_hunter = dronesim.siminfo()
         
         # this is a temporary solution for an unkown bug
-	try:
+        try:
             (absolute_x, absolute_y), _ = projection(np.matrix(position_target), np.matrix(position_hunter), np.matrix(orientation_hunter), w=float(self.width), h=float(self.height))
         except ValueError:
             print("valueerror occured, the parameter:")
@@ -142,7 +142,7 @@ class DroneSimEnv(gym.Env):
             print("target position:",position_target)
             raise
            
-        relative_x, relative_y = absolute_x / self.width, absolute_y / self.height:
+        relative_x, relative_y = absolute_x / self.width, absolute_y / self.height
         target_coordinate_in_view = np.array((relative_x, relative_y)).flatten()
         
         self.distance = np.linalg.norm(position_hunter - position_target)
@@ -218,7 +218,18 @@ class DroneSimEnv(gym.Env):
 
     def close(self):
         pass
+    
+    def get_pos(self):
+        position_hunter,orientation_hunter,acc_hunter,position_target,orientation_target,acc_target,thrust_hunter = dronesim.siminfo()
+        position_hunter = np.array(position_hunter)
+        position_hunter = position_hunter.reshape(3,1)
 
+        position_target = np.array(position_target)
+        position_target = position_target.reshape(3,1)
+
+        orientation_hunter = [math.degrees(orientation_hunter[i]) for i in range(3) ]
+        orientation_target = [math.degrees(orientation_target[i]) for i in range(3) ]
+        return position_hunter,orientation_hunter,position_target,orientation_target
 ##################for test###############################
 if __name__ == "__main__":
     env = DroneSimEnv()

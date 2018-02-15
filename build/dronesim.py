@@ -72,7 +72,7 @@ def cmdfromkeyboard():
     rolldict = {'a':-1,'d':1}
     pitchdict = {'w':1,'s':-1}
     yawdict = {'q':-1,'e':1}
-    throttledict = {'+':-1,'-':1}
+    throttledict = {'-':-1,'=':1}
     
     def checkkeyboard(keydict,default_val):
         for key in keydict.keys():
@@ -88,6 +88,53 @@ def cmdfromkeyboard():
     return roll,pitch,yaw,throttle        
     
 
+class visualdrone():
+    def __init__(self,viewrange = 50,arrowlen = 10):
+        self.range = viewrange
+        self.rawlen = self.range/arrowlen
+
+        fig = pl.figure(0)
+        self.axis3d = fig.add_subplot(111, projection='3d')
+
+    def render(self,pos_hunter,ori_hunter,pos_target,ori_target):
+        def Rot_bn(o):
+            A =o[2]
+
+            B =o[1]
+
+            C =o[0]
+
+            R = np.array([[np.cos(A)*np.cos(B), np.cos(A)*np.sin(B)*np.sin(C)-np.sin(A)*np.cos(C), np.cos(A)*np.sin(B)*np.cos(C) + np.sin(A)*np.sin(C)],
+
+                          [np.sin(A)*np.cos(B), np.sin(A)*np.sin(B)*np.sin(C)+np.cos(A)*np.cos(C), np.sin(A)*np.sin(B)*np.cos(C) - np.cos(A)*np.sin(C)],
+
+                          [-np.sin(B),       np.cos(B)*np.sin(C),                      np.cos(B)*np.cos(C)                       ]])
+
+            return R
+        
+        def draw3d(ax, xyz, R):
+            # We draw in ENU coordinates, R and xyz are in NED
+            ax.scatter(xyz[0], xyz[1], xyz[2])
+            ax.quiver(xyz[0], xyz[1], xyz[2], R[0, 0], R[1, 0], R[2, 0], pivot='tail', \
+                    color='red')
+            ax.quiver(xyz[0], xyz[1], xyz[2], R[0, 1], R[1, 1], R[2, 1], pivot='tail', \
+                    color='green')
+            ax.quiver(xyz[0], xyz[1], xyz[2], R[0, 2], R[1, 2], R[2, 2], pivot='tail', \
+            color='blue')        
+ 
+        self.axis3d.cla()
+        draw3d(self.axis3d,pos_hunter, self.rawlen * Rot_bn(ori_hunter))
+        draw3d(self.axis3d,pos_target, self.rawlen * Rot_bn(ori_target))
+        
+        self.axis3d.set_xlim(-self.range,self.range)
+        self.axis3d.set_ylim(-self.range,self.range)
+        self.axis3d.set_zlim(-self.range,self.range)
+        self.axis3d.set_xlabel('x')
+        self.axis3d.set_ylabel('y')
+        self.axis3d.set_zlabel('z')
+        
+        pl.pause(0.00001)
+        pl.draw()
 
 ##############test#######################
 if __name__ == "__main__":
@@ -121,55 +168,23 @@ if __name__ == "__main__":
         R = Rx.dot(Ry).dot(Rz)
         return R
 
-    #dronesimapi.siminit(1,2,3,4,5,6,
-    #                    1,2,3,4,5,6)
-
     siminit([1,2,3],[0,0,0],[4,6,5],[0,0,0])
-    
-    quadcolor = ['k']
-    fig = pl.figure(0)
-    axis3d = fig.add_subplot(111, projection='3d')
-    pl.figure(0)
-
+    renderer = visualdrone()
     it = 0
 
     last_pos = np.array([None,None,None])
 
     for t in range(10000):
         roll,pitch,yaw,throttle = cmdfromkeyboard()
-        #print(roll,pitch,yaw,throttle)
-        #dronesimapi.simcontrol(c_char(roll),c_char(pitch),c_char(yaw),c_char(throttle),c_char(0),c_char(0),c_char(0),c_char(0))
         simcontrol([roll,pitch,yaw,throttle])
         
-        #dronesimapi.simrun(c_ulonglong(5000000))
+ 
         simrun(5000000)
-        #outinfo = dronesimapi.siminfo()
         pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo()
-        #print("posisiton:",outinfo.contents.posx,outinfo.contents.posy,outinfo.contents.posz)
+       
 
-##        if it%30 == 0:
-##            axis3d.cla()
-##            ani.draw3d(axis3d,pos_hunter,Rot_bn(ori_hunter[0],ori_hunter[1],ori_hunter[2]), quadcolor[0])
-##            print(thrust)
-##            #ani.draw3d(axis3d,[outinfo.contents.posx_t,outinfo.contents.posy_t,outinfo.contents.posz_t], Rot_bn(outinfo.contents.thetax_t,outinfo.contents.thetay_t,outinfo.contents.thetaz_t), quadcolor[0])
-##            ani.draw3d(axis3d,pos_target, Rot_bn(ori_target[0],ori_target[1],ori_target[2]), quadcolor[0])
-##            axis3d.set_xlim(-10, 10)
-##            axis3d.set_ylim(-10, 10)
-##            axis3d.set_zlim(0, 15)
-##            axis3d.set_xlabel('South [m]')
-##            axis3d.set_ylabel('East [m]')
-##            axis3d.set_zlabel('Up [m]')
-##            pl.pause(0.00001)
-##            pl.draw()
-##            #print("aaa")
-
+        if it%30 == 0:
+            renderer.render(pos_hunter,ori_hunter,pos_target,ori_target)
         it+=1
-        time.sleep(0.1)
-        if last_pos.all()!=None:
-            speed = pos_hunter - last_pos
-            print('x:',speed[0],'y:',speed[1],'z:',speed[2])
-        last_pos = pos_hunter
-
     dronesimapi.simstop()
-
 

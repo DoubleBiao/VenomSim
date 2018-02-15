@@ -4,12 +4,12 @@ import matplotlib.pyplot as pl
 
 def draw3d(ax, xyz, R, quadcolor):
     # We draw in ENU coordinates, R and xyz are in NED
-    ax.scatter(xyz[1], xyz[0], -xyz[2], color=quadcolor)
-    ax.quiver(xyz[1], xyz[0], -xyz[2], R[0, 1], R[0, 0], R[0, 2], pivot='tail', \
+    ax.scatter(xyz[0], xyz[1], xyz[2], color=quadcolor)
+    ax.quiver(xyz[0], xyz[1], xyz[2], R[0, 1], R[0, 0], R[0, 2], pivot='tail', \
             color='red')
-    ax.quiver(xyz[1], xyz[0], -xyz[2], R[1, 1], R[1, 0], R[1, 2], pivot='tail', \
+    ax.quiver(xyz[0], xyz[1], xyz[2], R[1, 1], R[1, 0], R[1, 2], pivot='tail', \
             color='green')
-    ax.quiver(xyz[1], xyz[0], -xyz[2], -R[2, 1], -R[2, 0], -R[2, 2], pivot='tail', \
+    ax.quiver(xyz[0], xyz[1], xyz[2], -R[2, 1], -R[2, 0], -R[2, 2], pivot='tail', \
             color='blue')
 
 def draw2d(fig, X, fc, quadcolor):
