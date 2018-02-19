@@ -22,11 +22,7 @@ dronesimapi = CDLL('./drone_sim.so')
 #set input type
 
 dronesimapi.siminit.argtype = [c_double,c_double,c_double,c_double,c_double,c_double,\
-<<<<<<< HEAD
                                c_double,c_double,c_double,c_double,c_double,c_double,c_double]
-=======
-                               c_double,c_double,c_double,c_double,c_double,c_double]
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
 
 dronesimapi.simcontrol.argtype = [c_double,c_double,c_double,\
                                   c_double,c_double,c_double]
@@ -37,20 +33,12 @@ dronesimapi.siminfo.restype = POINTER(infoformat)
 
 
 #interface warper:
-<<<<<<< HEAD
 def siminit(pos_hunter, ori_hunter, pos_target, ori_target,mass_time):
     dronesimapi.siminit(c_double(pos_hunter[0]),c_double(pos_hunter[1]),c_double(pos_hunter[2]),\
                         c_double(ori_hunter[0]),c_double(ori_hunter[1]),c_double(ori_hunter[2]),\
                         c_double(pos_target[0]),c_double(pos_target[1]),c_double(pos_target[2]),\
                         c_double(ori_target[0]),c_double(ori_target[1]),c_double(ori_target[2]),\
                         c_double(mass_time))
-=======
-def siminit(pos_hunter, ori_hunter, pos_target, ori_target):
-    dronesimapi.siminit(c_double(pos_hunter[0]),c_double(pos_hunter[1]),c_double(pos_hunter[2]),\
-                        c_double(ori_hunter[0]),c_double(ori_hunter[1]),c_double(ori_hunter[2]),\
-                        c_double(pos_target[0]),c_double(pos_target[1]),c_double(pos_target[2]),\
-                        c_double(ori_target[0]),c_double(ori_target[1]),c_double(ori_target[2]),)
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
 
 def simrun(period):
     # input : period time in second
@@ -181,11 +169,7 @@ if __name__ == "__main__":
         R = Rx.dot(Ry).dot(Rz)
         return R
 
-<<<<<<< HEAD
     siminit([1,2,3],[0,0,0],[4,6,5],[0,0,0],2)
-=======
-    siminit([1,2,3],[0,0,0],[4,6,5],[0,0,0])
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
     renderer = visualdrone()
     it = 0
 
@@ -193,11 +177,7 @@ if __name__ == "__main__":
 
     for t in range(10000):
         roll,pitch,yaw,throttle = cmdfromkeyboard()
-<<<<<<< HEAD
         simcontrol([roll,pitch,yaw,throttle],[roll,pitch,yaw,throttle])
-=======
-        simcontrol([roll,pitch,yaw,throttle])
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
         
  
         simrun(5000000)

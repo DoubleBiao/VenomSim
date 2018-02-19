@@ -33,7 +33,6 @@ infoformat * outputbuffer;
 
 //init interface 
 extern "C" void siminit(double initx, double inity, double initz, double initroll, double initpitch, double inityaw,
-<<<<<<< HEAD
 											 double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t, double mass_time)
 {
 	//agent 
@@ -43,18 +42,6 @@ extern "C" void siminit(double initx, double inity, double initz, double initrol
 	//target
 	Quadcopter_target = new quadcopter;
 	Quadcopter_target->startSimulation(initx_t,inity_t,initz_t,initroll_t,initpitch_t,inityaw_t,mass_time);
-=======
-											 double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t)
-{
-	//agent 
-	Quadcopter_sim = new quadcopter;
-	Quadcopter_sim->startSimulation(initx,inity,initz,initroll,initpitch,inityaw);
-
-	//target
-	Quadcopter_target = new quadcopter;
-	Quadcopter_target->startSimulation(initx_t,inity_t,initz_t,initroll_t,initpitch_t,inityaw_t);
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
-
 	outputbuffer = new infoformat;
 }
 

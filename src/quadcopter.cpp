@@ -53,11 +53,7 @@ class quadcopter::quadcopterImpl
 		double get_acc(int index);
 		double get_thrust();
 		// check if simulation is still running
-<<<<<<< HEAD
 		bool startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double mass_time);
-=======
-		bool startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw);
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
 
 		void dosimulating( QS_TIMER_TIME_TYPE period);
 		void getcommands(double roll, double pitch, double yaw, double throttle);
@@ -80,11 +76,7 @@ class quadcopter::quadcopterImpl
 		Vector3d thetadot;
 		Vector4d pwmDutyCycle;				// motor
 		Vector4d rpm;
-<<<<<<< HEAD
 		double mass_time; // the mass factor of the target, which is used to slow donw the speed of target
-=======
-
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
 
 
 		/*
@@ -296,11 +288,7 @@ double quadcopter::quadcopterImpl::get_direction_vector(int index)
 	return temp;
 }
 
-<<<<<<< HEAD
 bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double mass_time)
-=======
-bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw)
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
 {
 
 
@@ -311,11 +299,8 @@ bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, dou
 	// init stabilizer
 	this->stabi.setInitYawLock(this->theta_ef_sensor_fusion(2));
 	this->stabi.setInitHeightLock(this->height_ef_sensor_fusion);
-<<<<<<< HEAD
 	
 	this->mass_time = mass_time;
-=======
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
 
 	return true;
 }
@@ -514,10 +499,7 @@ void quadcopter::quadcopterImpl::solve_diff_equation(QS_TIMER_TIME_TYPE time_del
 		acceleration(&xdotdot, this->rpm, this->theta, this->xdot, MASS, GRAVITY, MOTOR_CONSTANT, Vector3d(DRAG_CONSTANT_X, DRAG_CONSTANT_Y, DRAG_CONSTANT_Z));
         
         // advance system state
-<<<<<<< HEAD
 	this->xdotdot /= mass_time;
-=======
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
         this->xdot = this->xdot + d_dt * xdotdot;
         this->x = this->x + d_dt * this->xdot;
         
@@ -617,15 +599,9 @@ double quadcopter::get_thrust()
 	return this->qcimpl->get_thrust();
 }
 
-<<<<<<< HEAD
 bool quadcopter::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double mass_time)
 {
 	return this->qcimpl->startSimulation(initx,  inity,  initz, initroll, initpitch,inityaw,mass_time);
-=======
-bool quadcopter::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw)
-{
-	return this->qcimpl->startSimulation(initx,  inity,  initz, initroll, initpitch,inityaw);
->>>>>>> 4cb7fa75fdf243adeca168584153099970657c12
 }
 
 
