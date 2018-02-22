@@ -200,7 +200,8 @@ class DroneSimEnv(gym.Env):
             distance = np.linalg.norm(position_hunter - position_target)
 
         dronesim.siminit(np.squeeze(np.asarray(position_hunter)),np.squeeze(np.asarray(orientation_hunter)),\
-                         np.squeeze(np.asarray(position_target)),np.squeeze(np.asarray(orientation_target)),2)  #2 --> the acc factor on target
+                         np.squeeze(np.asarray(position_target)),np.squeeze(np.asarray(orientation_target)),
+                         20,5)  #2 --> the speed upbound for hunter and target
         
         self.previous_distance = distance
         self.state = self.get_state()

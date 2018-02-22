@@ -53,7 +53,7 @@ class quadcopter::quadcopterImpl
 		double get_acc(int index);
 		double get_thrust();
 		// check if simulation is still running
-		bool startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double mass_time);
+		bool startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound);
 
 		void dosimulating( QS_TIMER_TIME_TYPE period);
 		void getcommands(double roll, double pitch, double yaw, double throttle);
@@ -76,7 +76,7 @@ class quadcopter::quadcopterImpl
 		Vector3d thetadot;
 		Vector4d pwmDutyCycle;				// motor
 		Vector4d rpm;
-		double mass_time; // the mass factor of the target, which is used to slow donw the speed of target
+		double xdot_upbound; // speed upbound of drone, which is out of reality but important for agent training
 
 
 		/*
@@ -288,7 +288,7 @@ double quadcopter::quadcopterImpl::get_direction_vector(int index)
 	return temp;
 }
 
-bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double mass_time)
+bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound)
 {
 
 
@@ -300,7 +300,7 @@ bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, dou
 	this->stabi.setInitYawLock(this->theta_ef_sensor_fusion(2));
 	this->stabi.setInitHeightLock(this->height_ef_sensor_fusion);
 	
-	this->mass_time = mass_time;
+	this->xdot_upbound = speed_upbound;
 
 	return true;
 }
@@ -499,8 +499,13 @@ void quadcopter::quadcopterImpl::solve_diff_equation(QS_TIMER_TIME_TYPE time_del
 		acceleration(&xdotdot, this->rpm, this->theta, this->xdot, MASS, GRAVITY, MOTOR_CONSTANT, Vector3d(DRAG_CONSTANT_X, DRAG_CONSTANT_Y, DRAG_CONSTANT_Z));
         
         // advance system state
-	this->xdotdot /= mass_time;
+	this->xdotdot;
         this->xdot = this->xdot + d_dt * xdotdot;
+
+        // speed saturation
+	if(this->xdot.norm() > this->xdot_upbound) this->xdot = this->xdot.normalized()*this->xdot_upbound;  
+
+
         this->x = this->x + d_dt * this->xdot;
         
         // compute angular accelerations
@@ -599,9 +604,9 @@ double quadcopter::get_thrust()
 	return this->qcimpl->get_thrust();
 }
 
-bool quadcopter::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double mass_time)
+bool quadcopter::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound)
 {
-	return this->qcimpl->startSimulation(initx,  inity,  initz, initroll, initpitch,inityaw,mass_time);
+	return this->qcimpl->startSimulation(initx,  inity,  initz, initroll, initpitch,inityaw,speed_upbound);
 }
 
 
