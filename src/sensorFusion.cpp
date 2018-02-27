@@ -314,7 +314,7 @@ double sensorFusion::getEulerYawFromMagne(Vector3d magneBodyFrame)
 	{
 		orientation_tmp = Pi/2.0 - atan(magneEarthFrame(0)/magneEarthFrame(1));
 	}
-	else if(magneEarthFrame(2) < 0.0)
+	else if(magneEarthFrame(1) < 0.0)
 	{
 		orientation_tmp = 1.5*Pi - atan(magneEarthFrame(0)/magneEarthFrame(1));
 	}
