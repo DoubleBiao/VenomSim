@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <stdlib.h>
 #include <time.h>
 #include <Eigen/Dense>
+#include <math.h>
 
 #include "config.h"
 #include "mathHelp.h"
@@ -254,8 +255,8 @@ double quadcopter::quadcopterImpl::get_attitude(int index)
 {
 	double temp;
 	temp = this->theta(index);
-	if(index == 2)  //yaw 
-		temp = wrap_Pi(temp);
+	//if(index == 2)  //yaw 
+	//	temp = wrap_Pi(temp);
 	return temp;
 }
 
@@ -517,6 +518,7 @@ void quadcopter::quadcopterImpl::solve_diff_equation(QS_TIMER_TIME_TYPE time_del
         omega = omega + d_dt * omegadot;
         omega2thetadot(&(this->thetadot), omega, this->theta);
         this->theta = this->theta + d_dt * this->thetadot;
+	this->theta(2) = wrap_Pi(fmod(this->theta(2),Pi2));
 	}
 	
 	// calculate up and direction vector
