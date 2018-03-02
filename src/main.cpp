@@ -25,7 +25,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <iostream>
 
-
+const unsigned long long samplingperiod = 1e9/360;
 
 quadcopter * Quadcopter_sim;
 quadcopter * Quadcopter_target;
@@ -35,33 +35,43 @@ infoformat * outputbuffer;
 extern "C" void siminit(double initx, double inity, double initz, double initroll, double initpitch, double inityaw,
 											 double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t, double speed_upbound_hunter,double speed_upbound_target)
 {
-	//agent 
+	if(Quadcopter_sim != nullptr)  delete Quadcopter_sim;
+	if(Quadcopter_target != nullptr) delete Quadcopter_target;
+	if(outputbuffer == nullptr)  outputbuffer = new infoformat;
+
 	Quadcopter_sim = new quadcopter;
 	Quadcopter_sim->startSimulation(initx,inity,initz,initroll,initpitch,inityaw,speed_upbound_hunter);
 
-	//target
 	Quadcopter_target = new quadcopter;
 	Quadcopter_target->startSimulation(initx_t,inity_t,initz_t,initroll_t,initpitch_t,inityaw_t,speed_upbound_target);
-	outputbuffer = new infoformat;
-}
-
-
-//getcommand interface
-extern "C" void simcontrol(double roll,double pitch, double yaw, double throttle,
-			   double roll_t, double pitch_t, double yaw_t, double throttle_t)
-{
-	Quadcopter_sim->getcommands(roll,pitch,yaw,throttle);
-
-	Quadcopter_target->getcommands(roll_t,pitch_t,yaw_t,throttle_t);
 }
 
 
 //run interface 
-extern "C" void simrun(unsigned long long period)
+extern "C" void simrun(double roll, double pitch, double yaw, double throttle,
+		       double roll_t, double pitch_t, double yaw_t, double throttle_t,
+                       unsigned long long period)
 {
-	//std::cout<<period<<std::endl;
-	Quadcopter_sim->dosimulating(period);
-	Quadcopter_target->dosimulating(period);
+    unsigned long long simspan = period;
+    while(simspan > samplingperiod)
+    {
+        Quadcopter_sim->getcommands(roll,pitch,yaw,throttle);
+        Quadcopter_sim->dosimulating(QS_TIME_DELTA,samplingperiod);
+
+        Quadcopter_target->getcommands(roll_t,pitch_t,yaw_t,throttle_t);
+        Quadcopter_target->dosimulating(QS_TIME_DELTA,samplingperiod);
+
+
+        simspan -= samplingperiod;
+    }
+    if(simspan > 0)
+    {
+        Quadcopter_sim->getcommands(roll,pitch,yaw,throttle);
+        Quadcopter_sim->dosimulating(simspan,simspan);
+
+        Quadcopter_target->getcommands(roll_t,pitch_t,yaw_t,throttle_t);
+        Quadcopter_target->dosimulating(simspan,simspan);
+    }
 }
 
 //fetchinfo interface

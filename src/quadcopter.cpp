@@ -56,7 +56,7 @@ class quadcopter::quadcopterImpl
 		// check if simulation is still running
 		bool startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound);
 
-		void dosimulating( QS_TIMER_TIME_TYPE period);
+		void dosimulating( QS_TIMER_TIME_TYPE timestep,QS_TIMER_TIME_TYPE period);
 		void getcommands(double roll, double pitch, double yaw, double throttle);
 
 		// source: http://eigen.tuxfamily.org/dox-devel/group__TopicStructHavingEigenMembers.html
@@ -537,7 +537,7 @@ void quadcopter::quadcopterImpl::solve_diff_equation(QS_TIMER_TIME_TYPE time_del
 	this->total_time += period;
 }
 
-void quadcopter::quadcopterImpl::dosimulating( QS_TIMER_TIME_TYPE period)
+void quadcopter::quadcopterImpl::dosimulating(QS_TIMER_TIME_TYPE timestep, QS_TIMER_TIME_TYPE period)
 {
 	this->solve_diff_equation(QS_TIME_DELTA, period);
 }
@@ -613,9 +613,9 @@ bool quadcopter::startSimulation(double initx, double inity, double initz, doubl
 
 
 
-void quadcopter::dosimulating( QS_TIMER_TIME_TYPE period)
+void quadcopter::dosimulating(QS_TIMER_TIME_TYPE timestep, QS_TIMER_TIME_TYPE period)
 {
-	this->qcimpl->dosimulating(period);
+	this->qcimpl->dosimulating(timestep, period);
 }
 
 void quadcopter::getcommands(double roll, double pitch, double yaw, double throttle)
