@@ -92,8 +92,11 @@ class DroneSimEnv(gym.Env):
         roll, pitch, yaw, thrust = action[0], action[1], action[2], action[3]
 
         # update hunter
-        dronesim.simcontrol([roll,pitch,yaw,thrust])
-        dronesim.simrun(int(1e9/self.fps))   #transform from second to nanoseconds
+        #dronesim.simcontrol([roll,pitch,yaw,thrust])   # the old interface simcontrol is deprecated !!!!!!!!
+                # simcontrol is merged into simrun !!!!!!!!!! do careful
+
+	        # the parameter table of simrun is simtimespan(int), hunter commands (list) target commands(list)
+        dronesim.simrun(int(1e9/self.fps),[roll,pitch,yaw,thrust])   #transform from second to nanoseconds
         
         # update state
         self.state = self.get_state()
