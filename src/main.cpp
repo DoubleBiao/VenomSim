@@ -24,12 +24,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "quadcopter.h"
 
 #include <iostream>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include "camera.hpp"
 
 const unsigned long long samplingperiod = 1e9/360;
 
 quadcopter * Quadcopter_sim;
 quadcopter * Quadcopter_target;
 infoformat * outputbuffer;
+imagecoor * uwcoor;
 
 //init interface 
 extern "C" void siminit(double initx, double inity, double initz, double initroll, double initpitch, double inityaw,
@@ -38,6 +42,7 @@ extern "C" void siminit(double initx, double inity, double initz, double initrol
 	if(Quadcopter_sim != nullptr)  delete Quadcopter_sim;
 	if(Quadcopter_target != nullptr) delete Quadcopter_target;
 	if(outputbuffer == nullptr)  outputbuffer = new infoformat;
+        if(uwcoor == nullptr) uwcoor = new imagecoor;        
 
 	Quadcopter_sim = new quadcopter;
 	Quadcopter_sim->startSimulation(initx,inity,initz,initroll,initpitch,inityaw,speed_upbound_hunter);
@@ -122,4 +127,37 @@ extern "C" void simstop()
 	delete Quadcopter_sim;
 	delete Quadcopter_target;
 	delete outputbuffer;
+        delete uwcoor;
+}
+
+
+dronecamera cam(glm::vec3(0.0f,0.0f,0.0f));
+
+extern "C" imagecoor * simprojection(double hx,double hy, double hz, double hroll, double hpitch, double hyaw,
+                              double tx,double ty, double tz,
+                              double width,double height)
+{
+    using namespace glm;
+    //using namespace std;
+    //cout<<hx<<hy<<hz<<endl;
+    //cout<<hroll<<hpitch<<hyaw<<endl;
+    //cout<<tx<<ty<<tz<<endl;
+
+
+    mat4 model(1.0f);
+    model = cam.getviewpoint(glm::vec3(hx,hy,hz),glm::vec3(hroll,hpitch,hyaw))*model;
+    
+    mat4 projection = frustum(-0.01f, 0.01f, -0.01f, 0.01f, 0.01f, 500.0f);
+
+    vec4 viewport(0.0f, 0.0f, width, height);
+    vec3 original(tx, ty, tz);
+    
+    vec3 out2 = glm::project(original, model, projection, viewport);
+    uwcoor->u = out2[0];
+    uwcoor->v = out2[1];
+
+    //cout<<out2[0]<<","<<out2[1]<<endl;
+
+    //return uwcoor;
+       
 }

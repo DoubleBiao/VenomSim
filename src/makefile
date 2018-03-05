@@ -1,7 +1,7 @@
 CC = g++
 
 
-INCLUDES = -I../Eigen
+INCLUDES = -I../Eigen -I../glm-0.9.9-a2
 
 SHARE = -march=native -O2 -fPIC -shared
 

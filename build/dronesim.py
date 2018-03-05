@@ -16,6 +16,11 @@ class infoformat(Structure):
     ("thrust",c_double)\
         ]
 
+class imagecoor(Structure):
+    _fields_ = [\
+    ("u",c_double),("v",c_double)]
+
+
 #windows version interface 
 dronesimapi = CDLL('./drone_sim.so')
 
@@ -32,6 +37,12 @@ dronesimapi.simrun.argtype  = [c_double,c_double,c_double,\
 #set output type
 dronesimapi.siminfo.restype = POINTER(infoformat)
 
+
+dronesimapi.simprojection.argtype = [c_double,c_double,c_double,c_double,c_double,c_double,\
+                                     c_double,c_double,c_double,\
+                                     c_double,c_double]
+
+dronesimapi.simprojection.restype = POINTER(imagecoor)
 
 #interface warper:
 def siminit(pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target):
@@ -66,6 +77,14 @@ def siminfo():
 
     
     return pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,outinfo.contents.thrust
+
+def projection(pos_hunter,ori_hunter,pos_target,screen_width,screen_height):
+    outcoor = dronesimapi.simprojection(c_double(pos_hunter[0]),c_double(pos_hunter[1]),c_double(pos_hunter[2]),\
+                                        c_double(ori_hunter[0]),c_double(ori_hunter[1]),c_double(ori_hunter[2]),\
+                                        c_double(pos_target[0]),c_double(pos_target[1]),c_double(pos_target[2]),\
+                                        c_double(screen_width),c_double(screen_height))
+
+    return outcoor.contents.u,outcoor.contents.v
 
 def simstop():
     dronesimapi.simstop()
@@ -176,8 +195,9 @@ if __name__ == "__main__":
     it = 0
 
     last_pos = np.array([None,None,None])
-
-    for t in range(10000):
+    u,v = projection([10,0,0],[0,0,0],[0,0,0],600,800)
+    print(u,v)
+    for t in range(0):
         roll,pitch,yaw,throttle = cmdfromkeyboard()
         #simcontrol([roll,pitch,yaw,throttle],[roll,pitch,yaw,throttle])
         
