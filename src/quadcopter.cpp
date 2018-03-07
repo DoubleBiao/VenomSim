@@ -302,7 +302,7 @@ bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, dou
 	//this->stabi.setInitHeightLock(this->height_ef_sensor_fusion);
 	
 	//remove the sensor simulation
-	this->stabi.setInitYawLock(inityaw);
+	this->stabi.setInitYawLock(DEG2RAD(inityaw));
 	this->stabi.setInitHeightLock(initz);
 	
 
