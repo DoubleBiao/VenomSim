@@ -298,9 +298,14 @@ bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, dou
 	this->attitute_height_estimation_before_takeoff();
 
 	// init stabilizer
-	this->stabi.setInitYawLock(this->theta_ef_sensor_fusion(2));
-	this->stabi.setInitHeightLock(this->height_ef_sensor_fusion);
+	//this->stabi.setInitYawLock(this->theta_ef_sensor_fusion(2));
+	//this->stabi.setInitHeightLock(this->height_ef_sensor_fusion);
 	
+	//remove the sensor simulation
+	this->stabi.setInitYawLock(inityaw);
+	this->stabi.setInitHeightLock(initz);
+	
+
 	this->xdot_upbound = speed_upbound;
 
 	return true;
@@ -461,11 +466,11 @@ void quadcopter::quadcopterImpl::read_sensorFusion(void)
 void quadcopter::quadcopterImpl::read_controller()
 {	
 	this->stabi.compute_pwmDutyCycle(	&(this->pwmDutyCycle),
-						this->theta_ef_sensor_fusion,			// attitude
-						this->thetadot_ef_sensor_fusion,		// angular velocity
-						this->height_ef_sensor_fusion,			// height
-						this->heightdot_ef_sensor_fusion,		// vertical speed
-						this->heightdotdot_ef_sensor_fusion,	// vertical acceleration
+						this->theta,//this->theta_ef_sensor_fusion,			// attitude
+						this->thetadot,//this->thetadot_ef_sensor_fusion,		// angular velocity
+						this->x(2),//this->height_ef_sensor_fusion,			// height
+						this->xdot(2),//this->heightdot_ef_sensor_fusion,		// vertical speed
+						this->xdotdot(2),//this->heightdotdot_ef_sensor_fusion,	// vertical acceleration
 						this->theta_user(0),					// user roll
 						this->theta_user(1),					// user pitch
 						this->theta_user(2),					// user yaw
@@ -545,8 +550,8 @@ void quadcopter::quadcopterImpl::dosimulating(QS_TIMER_TIME_TYPE timestep, QS_TI
 void quadcopter::quadcopterImpl::getcommands(double roll, double pitch, double yaw, double throttle)
 {
 	this->read_receiver(roll, pitch, yaw, throttle);
-	this->read_sensors();
-	this->read_sensorFusion();
+	//this->read_sensors();
+	//this->read_sensorFusion();
 	this->read_controller();
 }
 
