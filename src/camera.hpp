@@ -7,6 +7,7 @@ struct imagecoor
 {
     double u;
     double v;
+    double w;
 };
 
 glm::mat4 getrotation4(glm::vec3 const & ori)
@@ -55,6 +56,14 @@ private:
 	glm::vec3 right;
 public:
 	dronecamera():target(-1,0,0),up(0,0,1),right(0,1,0){};
+	dronecamera(double roll, double pitch, double yaw):target(-1,0,0),up(0,0,1),right(0,1,0)
+	{
+                glm::vec3 installori(roll,pitch,yaw);
+		glm::mat3 R_install = getrotation3(installori);
+		target = R_install*target;
+		up = R_install*up;
+		right = R_install*right;
+	};
 	dronecamera(glm::vec3 const & installori):target(-1,0,0),up(0,0,1),right(0,1,0)
 	{
 		glm::mat3 R_install = getrotation3(installori);

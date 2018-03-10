@@ -1,5 +1,6 @@
 from ctypes import *
 import numpy as np
+import math
 import keyboard
 
 class infoformat(Structure):
@@ -18,7 +19,7 @@ class infoformat(Structure):
 
 class imagecoor(Structure):
     _fields_ = [\
-    ("u",c_double),("v",c_double)]
+    ("u",c_double),("v",c_double),("w",c_double)]
 
 
 #windows version interface 
@@ -43,6 +44,8 @@ dronesimapi.simprojection.argtype = [c_double,c_double,c_double,c_double,c_doubl
                                      c_double,c_double]
 
 dronesimapi.simprojection.restype = POINTER(imagecoor)
+
+dronesimapi.installcamera.argtype  = [c_double,c_double,c_double]
 
 #interface warper:
 def siminit(pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target):
@@ -78,13 +81,28 @@ def siminfo():
     
     return pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,outinfo.contents.thrust
 
-def projection(pos_hunter,ori_hunter,pos_target,screen_width,screen_height):
+def projection(pos_hunter,ori_hunter,pos_target,w,h):
     outcoor = dronesimapi.simprojection(c_double(pos_hunter[0]),c_double(pos_hunter[1]),c_double(pos_hunter[2]),\
                                         c_double(ori_hunter[0]),c_double(ori_hunter[1]),c_double(ori_hunter[2]),\
                                         c_double(pos_target[0]),c_double(pos_target[1]),c_double(pos_target[2]),\
-                                        c_double(screen_width),c_double(screen_height))
+                                        c_double(w),c_double(h))
+    u,v,w = outcoor.contents.u,outcoor.contents.v,outcoor.contents.w
+    inscrean = True
+    
+    if math.isnan(u) or math.isinf(u):
+        inscrean = False
+    if math.isnan(v) or math.isinf(v):
+        inscrean = False
+    if math.isnan(w) or math.isinf(w):
+        inscrean = False
+    if w < 0 or w > 1:
+        inscrean = False
+    
+    
+    return u,v,inscrean
 
-    return outcoor.contents.u,outcoor.contents.v
+def installcamera(installori):
+    dronesimapi.installcamera(c_double(installori[0]),c_double(installori[1]),c_double(installori[2]))
 
 def simstop():
     dronesimapi.simstop()
@@ -190,7 +208,7 @@ if __name__ == "__main__":
         R = Rx.dot(Ry).dot(Rz)
         return R
 
-    siminit([1,2,0],[0,0,0],[4,6,0],[0,0,0],5,10)
+    siminit([1,2,0],[0,0,180],[4,6,0],[0,0,0],5,10)
     renderer = visualdrone()
     it = 0
 
@@ -202,7 +220,7 @@ if __name__ == "__main__":
         #simcontrol([roll,pitch,yaw,throttle],[roll,pitch,yaw,throttle])
         
  
-        simrun(5000000,[0,0,0,0],[roll,pitch,yaw,throttle])
+        simrun(5000000,[0,0,0,0],[0,0,0,0])
         pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo()
        
 

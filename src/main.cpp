@@ -42,7 +42,7 @@ extern "C" void siminit(double initx, double inity, double initz, double initrol
 	if(Quadcopter_sim != nullptr)  delete Quadcopter_sim;
 	if(Quadcopter_target != nullptr) delete Quadcopter_target;
 	if(outputbuffer == nullptr)  outputbuffer = new infoformat;
-        if(uwcoor == nullptr) uwcoor = new imagecoor;        
+        //if(uwcoor == nullptr) uwcoor = new imagecoor;        
 
 	Quadcopter_sim = new quadcopter;
 	Quadcopter_sim->startSimulation(initx,inity,initz,initroll,initpitch,inityaw,speed_upbound_hunter);
@@ -133,6 +133,13 @@ extern "C" void simstop()
 
 dronecamera cam(glm::vec3(0.0f,0.0f,0.0f));
 
+extern "C" void installcamera(double roll, double pitch, double yaw)
+{
+	if(uwcoor == nullptr) uwcoor = new imagecoor; 
+	cam = dronecamera(roll,pitch,yaw);
+}
+
+
 extern "C" imagecoor * simprojection(double hx,double hy, double hz, double hroll, double hpitch, double hyaw,
                               double tx,double ty, double tz,
                               double width,double height)
@@ -155,9 +162,11 @@ extern "C" imagecoor * simprojection(double hx,double hy, double hz, double hrol
     vec3 out2 = glm::project(original, model, projection, viewport);
     uwcoor->u = out2[0];
     uwcoor->v = out2[1];
+    uwcoor->w = out2[2];
+
 
     //cout<<out2[0]<<","<<out2[1]<<endl;
 
-    //return uwcoor;
+    return uwcoor;
        
 }
