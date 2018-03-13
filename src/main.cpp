@@ -37,7 +37,10 @@ imagecoor * uwcoor;
 
 //init interface 
 extern "C" void siminit(double initx, double inity, double initz, double initroll, double initpitch, double inityaw,
-											 double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t, double speed_upbound_hunter,double speed_upbound_target)
+			double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t,double inityaw_t,
+			double speed_upbound_hunter,double speed_upbound_target,
+                        unsigned int width, unsigned int height,
+		        int offscreen))
 {
 	if(Quadcopter_sim != nullptr)  delete Quadcopter_sim;
 	if(Quadcopter_target != nullptr) delete Quadcopter_target;

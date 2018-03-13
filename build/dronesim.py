@@ -1,5 +1,6 @@
 from ctypes import *
 import numpy as np
+from numpy.ctypeslib import ndpointer
 import math
 import keyboard
 
@@ -9,7 +10,6 @@ class infoformat(Structure):
     ("velocityx",c_double),("velocityy",c_double),("velocityz",c_double),\
     ("accx",c_double),("accy",c_double),("accz",c_double),\
     ("thetax",c_double),("thetay",c_double),("thetaz",c_double),\
-
     ("posx_t",c_double),("posy_t",c_double),("posz_t",c_double),\
     ("velocityx_t",c_double),("velocityy_t",c_double),("velocityz_t",c_double),\
     ("accx_t",c_double),("accy_t",c_double),("accz_t",c_double),\
@@ -29,7 +29,9 @@ dronesimapi = CDLL('./drone_sim.so')
 
 dronesimapi.siminit.argtype = [c_double,c_double,c_double,c_double,c_double,c_double,\
                                c_double,c_double,c_double,c_double,c_double,c_double,\
-                               c_double,c_double]
+                               c_double,c_double,\
+                               c_uint,c_uint,\
+                               c_int]
 
 dronesimapi.simrun.argtype  = [c_double,c_double,c_double,\
                                c_double,c_double,c_double,\
@@ -43,17 +45,21 @@ dronesimapi.simprojection.argtype = [c_double,c_double,c_double,c_double,c_doubl
                                      c_double,c_double,c_double,\
                                      c_double,c_double]
 
+dronesimapi.siminfo.argtypes = [ndpointer(c_ubyte)]
 dronesimapi.simprojection.restype = POINTER(imagecoor)
 
 dronesimapi.installcamera.argtype  = [c_double,c_double,c_double]
 
 #interface warper:
-def siminit(pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target):
+def siminit(pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target,\
+            scr_width,scr_height,offscreenflag = False):
     dronesimapi.siminit(c_double(pos_hunter[0]),c_double(pos_hunter[1]),c_double(pos_hunter[2]),\
                         c_double(ori_hunter[0]),c_double(ori_hunter[1]),c_double(ori_hunter[2]),\
                         c_double(pos_target[0]),c_double(pos_target[1]),c_double(pos_target[2]),\
                         c_double(ori_target[0]),c_double(ori_target[1]),c_double(ori_target[2]),\
-                        c_double(speed_upbound_hunter),c_double(speed_upbound_target))
+                        c_double(speed_upbound_hunter),c_double(speed_upbound_target),\
+                        scr_width,scr_height,\
+                        offscreenflag)
 
 def simrun(period,huntercmd,targetcmd = None):
     # input : period time in second
@@ -68,8 +74,8 @@ def simrun(period,huntercmd,targetcmd = None):
 
 
 
-def siminfo():
-    outinfo = dronesimapi.siminfo()
+def siminfo(outimg):
+    outinfo = dronesimapi.siminfo(outimg)
     pos_hunter = np.array([outinfo.contents.posx,outinfo.contents.posy,outinfo.contents.posz])
     ori_hunter = np.array([outinfo.contents.thetax,outinfo.contents.thetay,outinfo.contents.thetaz])
     acc_hunter = np.array([outinfo.contents.accx,outinfo.contents.accy,outinfo.contents.accz])
@@ -208,7 +214,11 @@ if __name__ == "__main__":
         R = Rx.dot(Ry).dot(Rz)
         return R
 
-    siminit([1,2,0],[0,0,180],[4,6,0],[0,0,0],5,10)
+    SCR_WIDTH = 400
+    SCR_HEIGHT = 300
+    outimg = np.zeros((SCR_HEIGHT,SCR_WIDTH*3)).astype(np.uint8)
+
+    siminit([1,2,0],[0,0,180],[4,6,0],[0,0,0],5,10,SCR_WIDTH,SCR_HEIGHT,0)
     renderer = visualdrone()
     it = 0
 
@@ -220,7 +230,7 @@ if __name__ == "__main__":
         
         simrun(int(1e9/100),[roll,pitch,yaw,throttle],[0,0,0,0])
 
-        pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo()
+        pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo(outimg)
        
 
         if it%30 == 0:

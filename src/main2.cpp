@@ -43,7 +43,8 @@ imagecoor * uwcoor;
 //init interface 
 extern "C" void siminit(double initx, double inity, double initz, double initroll, double initpitch, double inityaw,
 			double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t, 
-                        double speed_upbound_hunter,double speed_upbound_target)
+                        double speed_upbound_hunter,double speed_upbound_target,
+                        unsigned int width, unsigned int height,int offscreen)
 {
 	std::cout<<"begin"<<std::endl;
 	if(Quadcopter_sim != nullptr)  delete Quadcopter_sim;
@@ -53,6 +54,8 @@ extern "C" void siminit(double initx, double inity, double initz, double initrol
 	std::cout<<"evething is good so far"<<std::endl;
         if(Render == nullptr) 
 	{
+		bool offscreenflag = (offscreen == 0? false:true );   //0 --> false, nonzero ---> true 
+		
 		std::vector<std::string> faces(0);	
 		faces.push_back(std::string("src/rt.jpg"));
 		faces.push_back(std::string("src/lf.jpg"));
@@ -60,7 +63,8 @@ extern "C" void siminit(double initx, double inity, double initz, double initrol
 		faces.push_back(std::string("src/dn.jpg"));
 		faces.push_back(std::string("src/ft.jpg"));
 		faces.push_back(std::string("src/bk.jpg"));
-		Render = new dronerender("shader/vertex3.txt","shader/fragment3.txt","src/simpledrone.obj","shader/landv.txt","shader/landf.txt",faces);
+		Render = new dronerender("shader/vertex3.txt","shader/fragment3.txt","src/simpledrone.obj","shader/landv.txt","shader/landf.txt",faces,
+                width,height,offscreenflag);
 	}
       
 	std::cout<<"begin to new copters"<<std::endl;
@@ -100,7 +104,7 @@ extern "C" void simrun(double roll, double pitch, double yaw, double throttle,
 }
 
 //fetchinfo interface
-extern "C" infoformat * siminfo()
+extern "C" infoformat * siminfo(unsigned char *img)
 {
 	outputbuffer->posx = Quadcopter_sim->get_position(0);
 	outputbuffer->posy = Quadcopter_sim->get_position(1);
@@ -138,18 +142,23 @@ extern "C" infoformat * siminfo()
 	//std::cout<<outputbuffer->posx<<outputbuffer->posy<<outputbuffer->posz<<std::endl;
 	if(Render != nullptr)
 	{
-            if(!Render->dorender(
-                outputbuffer->posx,outputbuffer->posy,outputbuffer->posz,
-                RAD2DEG(outputbuffer->thetax),RAD2DEG(outputbuffer->thetay),RAD2DEG(outputbuffer->thetaz),
-               outputbuffer->posx_t,outputbuffer->posy_t,outputbuffer->posz_t,
-                RAD2DEG(outputbuffer->thetax_t),RAD2DEG(outputbuffer->thetay_t),RAD2DEG(outputbuffer->thetaz_t))
-		  )
-	    {
-                delete Render;
-                Render = nullptr;
-	    }
+		//************************off_screen buffer***********************
+		bool windstate = Render->dorender
+		(
+			outputbuffer->posx,outputbuffer->posy,outputbuffer->posz,
+			RAD2DEG(outputbuffer->thetax),RAD2DEG(outputbuffer->thetay),RAD2DEG(outputbuffer->thetaz),
+			outputbuffer->posx_t,outputbuffer->posy_t,outputbuffer->posz_t,
+			RAD2DEG(outputbuffer->thetax_t),RAD2DEG(outputbuffer->thetay_t),RAD2DEG(outputbuffer->thetaz_t),
+			img);
+
+		if(!windstate)
+		{
+			delete Render;
+			Render = nullptr;
+		}
 
 	}
+
 	return outputbuffer;
 }
 
