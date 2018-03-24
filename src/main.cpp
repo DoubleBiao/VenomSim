@@ -37,17 +37,18 @@ imagecoor * uwcoor;
 
 //init interface 
 extern "C" void siminit(double initx, double inity, double initz, double initroll, double initpitch, double inityaw,
-											 double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t, double speed_upbound_hunter,double speed_upbound_target)
+											 double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t, double speed_upbound_hunter,double speed_upbound_target,
+                        double yawdot_bound, double yawdot_bound_t)
 {
 	if(Quadcopter_sim != nullptr)  delete Quadcopter_sim;
 	if(Quadcopter_target != nullptr) delete Quadcopter_target;
 	if(outputbuffer == nullptr)  outputbuffer = new infoformat;      
 
 	Quadcopter_sim = new quadcopter;
-	Quadcopter_sim->startSimulation(initx,inity,initz,initroll,initpitch,inityaw,speed_upbound_hunter);
+	Quadcopter_sim->startSimulation(initx,inity,initz,initroll,initpitch,inityaw,speed_upbound_hunter,yawdot_bound);
 
 	Quadcopter_target = new quadcopter;
-	Quadcopter_target->startSimulation(initx_t,inity_t,initz_t,initroll_t,initpitch_t,inityaw_t,speed_upbound_target);
+	Quadcopter_target->startSimulation(initx_t,inity_t,initz_t,initroll_t,initpitch_t,inityaw_t,speed_upbound_target,yawdot_bound_t);
 }
 
 
@@ -127,6 +128,12 @@ extern "C" void simstop()
 	delete Quadcopter_target;
 	delete outputbuffer;
         if(uwcoor!= nullptr) delete uwcoor;
+
+
+       	outputbuffer = nullptr;
+	Quadcopter_sim = nullptr;
+	Quadcopter_target = nullptr;
+        uwcoor = nullptr;
 }
 
 

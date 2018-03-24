@@ -48,6 +48,7 @@ class stabilizer
 		void setInitHeightLock(double heightInitlock);
 		void resetIntegrals();
 		void setFlightMode(stable_flight_mode flight_mode_arg);
+                void setYawdotbound(double bound);
 		void compute_pwmDutyCycle( 	Vector4d *pwmDutyCycle,
 												Vector3d RPY_is,
 												Vector3d RPYDot_is,
@@ -78,6 +79,8 @@ class stabilizer
 		// transformation function
 		Vector3d getBodyRatesFromEulerRates(Vector3d eulerAngles, Vector3d eulerRatesDesired);
 		double getBodyVerticalFromEarthVertical(Vector3d eulerAngles, double earthVertical);
+
+                double yawdot_bound;
 };
 
 #endif

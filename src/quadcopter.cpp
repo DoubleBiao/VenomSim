@@ -54,7 +54,7 @@ class quadcopter::quadcopterImpl
 		double get_acc(int index);
 		double get_thrust();
 		// check if simulation is still running
-		bool startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound);
+		bool startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound,double yawdot_bound);
 
 		void dosimulating( QS_TIMER_TIME_TYPE timestep,QS_TIMER_TIME_TYPE period);
 		void getcommands(double roll, double pitch, double yaw, double throttle);
@@ -289,7 +289,7 @@ double quadcopter::quadcopterImpl::get_direction_vector(int index)
 	return temp;
 }
 
-bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound)
+bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound,double yawdot_bound)
 {
 
 
@@ -304,7 +304,7 @@ bool quadcopter::quadcopterImpl::startSimulation(double initx, double inity, dou
 	//remove the sensor simulation
 	this->stabi.setInitYawLock(DEG2RAD(inityaw));
 	this->stabi.setInitHeightLock(initz);
-	
+	this->stabi.setYawdotbound(yawdot_bound);
 
 	this->xdot_upbound = speed_upbound;
 
@@ -611,9 +611,9 @@ double quadcopter::get_thrust()
 	return this->qcimpl->get_thrust();
 }
 
-bool quadcopter::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound)
+bool quadcopter::startSimulation(double initx, double inity, double initz, double initroll, double initpitch, double inityaw, double speed_upbound,double yawdot_bound)
 {
-	return this->qcimpl->startSimulation(initx,  inity,  initz, initroll, initpitch,inityaw,speed_upbound);
+	return this->qcimpl->startSimulation(initx,  inity,  initz, initroll, initpitch,inityaw,speed_upbound,yawdot_bound);
 }
 
 

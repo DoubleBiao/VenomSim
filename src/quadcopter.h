@@ -40,7 +40,8 @@ class quadcopter
 		double get_direction_vector(int index);
 
 		// check if simulation is still running
-		bool startSimulation(double initx, double inity, double initz, double initraw, double initpitch, double inityaw,double speed_upbound);
+		bool startSimulation(double initx, double inity, double initz, double initraw, double initpitch, double inityaw,double speed_upbound,
+                double yawdot_bound);
 		
 		void dosimulating( QS_TIMER_TIME_TYPE timestep, QS_TIMER_TIME_TYPE period);
 		void getcommands(double roll, double pitch, double yaw, double throttle);

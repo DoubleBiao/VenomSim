@@ -66,6 +66,10 @@ void stabilizer::setInitHeightLock(double heightInitlock)
 	this->heightLock = heightInitlock;
 }
 
+void stabilizer::setYawdotbound(double bound)
+{
+        this->yawdot_bound = bound;
+}
 void stabilizer::resetIntegrals()
 {
 	pidRoll[STAB].zeroErrorIntegral();
@@ -97,8 +101,9 @@ void stabilizer::compute_pwmDutyCycle( 	Vector4d *pwmDutyCycle,
 	// map rx input to target angles
 	roll_rx = mapp<double>(roll_rx, RECEIVER_PWM_MIN, RECEIVER_PWM_MAX, -30.0, 30.0);
 	pitch_rx = mapp<double>(pitch_rx, RECEIVER_PWM_MIN, RECEIVER_PWM_MAX, -30.0, 30.0);
-	yaw_rx = mapp<double>(yaw_rx, RECEIVER_PWM_MIN, RECEIVER_PWM_MAX, -180.0, 180.0);
-	yaw_rx = -yaw_rx;
+	//yaw_rx = mapp<double>(yaw_rx, RECEIVER_PWM_MIN, RECEIVER_PWM_MAX, -180.0, 180.0);
+	yaw_rx = mapp<double>(yaw_rx, RECEIVER_PWM_MIN, RECEIVER_PWM_MAX, -yawdot_bound, yawdot_bound);
+        yaw_rx = -yaw_rx;
 
 	// limit roll and pitch sum to maximum
 	double tilt_uncorrected = RAD2DEG(acos(cos(DEG2RAD(roll_rx))*cos(DEG2RAD(pitch_rx))));

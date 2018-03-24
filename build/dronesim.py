@@ -2,6 +2,8 @@ from ctypes import *
 import numpy as np
 import math
 import keyboard
+import matplotlib.pyplot as pl
+from mpl_toolkits.mplot3d import Axes3D
 
 class infoformat(Structure):
     _fields_ = [\
@@ -29,7 +31,7 @@ dronesimapi = CDLL('./drone_sim.so')
 
 dronesimapi.siminit.argtype = [c_double,c_double,c_double,c_double,c_double,c_double,\
                                c_double,c_double,c_double,c_double,c_double,c_double,\
-                               c_double,c_double]
+                               c_double,c_double,c_double,c_double]
 
 dronesimapi.simrun.argtype  = [c_double,c_double,c_double,\
                                c_double,c_double,c_double,\
@@ -49,12 +51,14 @@ dronesimapi.installcamera.argtype  = [c_double,c_double,c_double,\
                                       c_double,c_double,c_double,c_double,c_double,c_double]
 
 #interface warper:
-def siminit(pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target):
+def siminit(pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target,\
+            yawdot_bound_hunter = 180,yawdot_bound_target = 180):
     dronesimapi.siminit(c_double(pos_hunter[0]),c_double(pos_hunter[1]),c_double(pos_hunter[2]),\
                         c_double(ori_hunter[0]),c_double(ori_hunter[1]),c_double(ori_hunter[2]),\
                         c_double(pos_target[0]),c_double(pos_target[1]),c_double(pos_target[2]),\
                         c_double(ori_target[0]),c_double(ori_target[1]),c_double(ori_target[2]),\
-                        c_double(speed_upbound_hunter),c_double(speed_upbound_target))
+                        c_double(speed_upbound_hunter),c_double(speed_upbound_target),\
+                        c_double(yawdot_bound_hunter),c_double(yawdot_bound_target))
 
 def simrun(period,huntercmd,targetcmd = None):
     # input : period time in second
@@ -193,37 +197,12 @@ class visualdrone():
 
 ##############test#######################
 if __name__ == "__main__":
-    import animation as ani
+    
     import numpy as np
     from scipy import linalg as la
-    import matplotlib.pyplot as pl
     import time
 
-
-    def Rot_bn(phi,theta,psi):
-        cphi = np.cos(phi)
-        sphi = np.sin(phi)
-        cthe = np.cos(theta)
-        sthe = np.sin(theta)
-        cpsi = np.cos(psi)
-        spsi = np.sin(psi)
-
-        Rx = np.array([[1,    0,      0], \
-                       [0,  cphi,  sphi], \
-                       [0, -sphi,  cphi]])
-
-        Ry = np.array([[cthe,  0,  -sthe], \
-                       [   0,  1,      0], \
-                       [sthe,  0,   cthe]])
-
-        Rz = np.array([[ cpsi,  spsi, 0], \
-                       [-spsi,  cpsi, 0], \
-                       [    0,    0, 1]])
-
-        R = Rx.dot(Ry).dot(Rz)
-        return R
-
-    siminit([1,2,0],[0,0,180],[4,6,0],[0,0,0],5,10)
+    siminit([1,2,0],[0,0,180],[4,6,0],[0,0,0],5,10,180,180)
     renderer = visualdrone()
     it = 0
 
