@@ -45,7 +45,8 @@ dronesimapi.simprojection.argtype = [c_double,c_double,c_double,c_double,c_doubl
 
 dronesimapi.simprojection.restype = POINTER(imagecoor)
 
-dronesimapi.installcamera.argtype  = [c_double,c_double,c_double]
+dronesimapi.installcamera.argtype  = [c_double,c_double,c_double,\
+                                      c_double,c_double,c_double,c_double,c_double,c_double]
 
 #interface warper:
 def siminit(pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target):
@@ -101,8 +102,22 @@ def projection(pos_hunter,ori_hunter,pos_target,w,h):
     
     return u,v,inscrean
 
-def installcamera(installori):
-    dronesimapi.installcamera(c_double(installori[0]),c_double(installori[1]),c_double(installori[2]))
+def installcamera(installori,F,H,FOVnear,FOVfar):  
+#F,H is the angle in degrees, FOVnear and FOVfar are the position of near and far plane
+    def getnearsize(F,H,FOVnear):
+        F = np.cos(np.radians(F))
+        H = np.cos(np.radians(H))
+        D = np.matrix([[F + 1, F - 1],[H - 1, H + 1]])
+        b = np.matrix([[4 - 4*F],[4 - 4*H]]) * FOVnear**2
+        upandright = D.I*b
+        up = np.sqrt(upandright[0,0])/2
+        right = np.sqrt(upandright[1,0])/2
+        return up,right
+    
+    up,right = getnearsize(F,H,FOVnear)
+    print(up,right)
+    dronesimapi.installcamera(c_double(installori[0]),c_double(installori[1]),c_double(installori[2]),\
+                              c_double(-right),c_double(right),c_double(-up),c_double(up),c_double(FOVnear),c_double(FOVfar))
 
 def simstop():
     dronesimapi.simstop()
@@ -213,7 +228,10 @@ if __name__ == "__main__":
     it = 0
 
     last_pos = np.array([None,None,None])
-    #u,v = projection([10,0,0],[0,0,0],[0,0,0],600,800)
+
+    #installcamera([0,0,0],110,63, 0.01, 500.0)
+    #u,v,t = projection([0,0,0],[0,0,0],[-0.01,0.022082516790052263,0.03462007361006086],600,800)
+
     #print(u,v)
     for t in range(10000):
         roll,pitch,yaw,throttle = cmdfromkeyboard()

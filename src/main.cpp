@@ -41,8 +41,7 @@ extern "C" void siminit(double initx, double inity, double initz, double initrol
 {
 	if(Quadcopter_sim != nullptr)  delete Quadcopter_sim;
 	if(Quadcopter_target != nullptr) delete Quadcopter_target;
-	if(outputbuffer == nullptr)  outputbuffer = new infoformat;
-        //if(uwcoor == nullptr) uwcoor = new imagecoor;        
+	if(outputbuffer == nullptr)  outputbuffer = new infoformat;      
 
 	Quadcopter_sim = new quadcopter;
 	Quadcopter_sim->startSimulation(initx,inity,initz,initroll,initpitch,inityaw,speed_upbound_hunter);
@@ -127,16 +126,19 @@ extern "C" void simstop()
 	delete Quadcopter_sim;
 	delete Quadcopter_target;
 	delete outputbuffer;
-        delete uwcoor;
+        if(uwcoor!= nullptr) delete uwcoor;
 }
 
 
 dronecamera cam(glm::vec3(0.0f,0.0f,0.0f));
 
-extern "C" void installcamera(double roll, double pitch, double yaw)
+extern "C" void installcamera(double roll, double pitch, double yaw,
+                              double FOVleft, double FOVright, double FOVbottom, double FOVtop, double FOVnear, double FOVfar)
 {
 	if(uwcoor == nullptr) uwcoor = new imagecoor; 
 	cam = dronecamera(roll,pitch,yaw);
+        cam.setfrustum(FOVleft, FOVright, FOVbottom, FOVtop, FOVnear, FOVfar);
+
 }
 
 
@@ -145,16 +147,16 @@ extern "C" imagecoor * simprojection(double hx,double hy, double hz, double hrol
                               double width,double height)
 {
     using namespace glm;
-    //using namespace std;
-    //cout<<hx<<hy<<hz<<endl;
-    //cout<<hroll<<hpitch<<hyaw<<endl;
-    //cout<<tx<<ty<<tz<<endl;
+    using namespace std;
+    //cout<<hx<<" "<<hy<<" "<<hz<<endl;
+    //cout<<hroll<<" "<<hpitch<<" "<<hyaw<<endl;
+    //cout<<tx<<" "<<ty<<" "<<tz<<endl;
 
 
     mat4 model(1.0f);
     model = cam.getviewpoint(glm::vec3(hx,hy,hz),glm::vec3(hroll,hpitch,hyaw))*model;
     
-    mat4 projection = frustum(-0.01f, 0.01f, -0.01f, 0.01f, 0.01f, 500.0f);
+    mat4 projection = cam.getfrustum();//frustum(-0.01f, 0.01f, -0.01f, 0.01f, 0.01f, 500.0f);
 
     vec4 viewport(0.0f, 0.0f, width, height);
     vec3 original(tx, ty, tz);
@@ -165,7 +167,7 @@ extern "C" imagecoor * simprojection(double hx,double hy, double hz, double hrol
     uwcoor->w = out2[2];
 
 
-    //cout<<out2[0]<<","<<out2[1]<<endl;
+    //cout<<out2[0]<<","<<out2[1]<<","<<out2[2]<<endl;
 
     return uwcoor;
        

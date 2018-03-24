@@ -54,6 +54,7 @@ private:
 	glm::vec3 target;
 	glm::vec3 up;
 	glm::vec3 right;
+        glm::mat4 projection;
 public:
 	dronecamera():target(-1,0,0),up(0,0,1),right(0,1,0){};
 	dronecamera(double roll, double pitch, double yaw):target(-1,0,0),up(0,0,1),right(0,1,0)
@@ -78,4 +79,13 @@ public:
 		target_now = target_now + cam_pos;
 		return glm::lookAt(cam_pos,target_now,R_body*up);
 	};
+        void setfrustum(double left, double right, double bottom, double top, double nearVal, double farVal)
+        {
+             projection = glm::frustum(left, right, bottom, top, nearVal, farVal);
+        };
+        glm::mat4 getfrustum()
+        {
+             return projection;
+        };
+
 };
