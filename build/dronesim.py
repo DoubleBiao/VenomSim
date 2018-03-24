@@ -112,7 +112,7 @@ def installcamera(installori,F,H,FOVnear,FOVfar):
         upandright = D.I*b
         up = np.sqrt(upandright[0,0])/2
         right = np.sqrt(upandright[1,0])/2
-        return up,right
+        #return up,right
     
     up,right = getnearsize(F,H,FOVnear)
     print(up,right)
