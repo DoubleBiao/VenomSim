@@ -31,11 +31,11 @@ dronesimapi = CDLL('./drone_sim.so')
 
 dronesimapi.siminit.argtype = [c_double,c_double,c_double,c_double,c_double,c_double,\
                                c_double,c_double,c_double,c_double,c_double,c_double,\
-                               c_double,c_double,c_double,c_double,\
-                               c_ulonglong,c_ulonglong,c_ulonglong]
+                               c_double,c_double,c_double,c_double]
 
 dronesimapi.simrun.argtype  = [c_double,c_double,c_double,\
-                               c_double,c_double,c_double]
+                               c_double,c_double,c_double,\
+                               c_ulonglong]
 
 #set output type
 dronesimapi.siminfo.restype = POINTER(infoformat)
@@ -51,26 +51,26 @@ dronesimapi.installcamera.argtype  = [c_double,c_double,c_double,\
                                       c_double,c_double,c_double,c_double,c_double,c_double]
 
 #interface warper:
-def siminit(period, pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target,\
-            yawdot_bound_hunter = 180,yawdot_bound_target = 180,\
-            sensingdelay = int(0), ctrldelay = int(0)):
-
+def siminit(pos_hunter, ori_hunter, pos_target, ori_target,speed_upbound_hunter,speed_upbound_target,\
+            yawdot_bound_hunter = 180,yawdot_bound_target = 180):
     dronesimapi.siminit(c_double(pos_hunter[0]),c_double(pos_hunter[1]),c_double(pos_hunter[2]),\
                         c_double(ori_hunter[0]),c_double(ori_hunter[1]),c_double(ori_hunter[2]),\
                         c_double(pos_target[0]),c_double(pos_target[1]),c_double(pos_target[2]),\
                         c_double(ori_target[0]),c_double(ori_target[1]),c_double(ori_target[2]),\
                         c_double(speed_upbound_hunter),c_double(speed_upbound_target),\
-                        c_double(yawdot_bound_hunter),c_double(yawdot_bound_target),\
-                        c_ulonglong(period),c_ulonglong(sensingdelay),c_ulonglong(ctrldelay))
+                        c_double(yawdot_bound_hunter),c_double(yawdot_bound_target))
 
-def simrun(huntercmd,targetcmd = None):
+def simrun(period,huntercmd,targetcmd = None):
     # input : period time in second
     if targetcmd:
         dronesimapi.simrun(c_double(huntercmd[0]),c_double(huntercmd[1]),c_double(huntercmd[2]),c_double(huntercmd[3]),\
-                           c_double(targetcmd[0]),c_double(targetcmd[1]),c_double(targetcmd[2]),c_double(targetcmd[3]))
+                           c_double(targetcmd[0]),c_double(targetcmd[1]),c_double(targetcmd[2]),c_double(targetcmd[3]),\
+                           c_ulonglong(period))
     else:
         dronesimapi.simrun(c_double(huntercmd[0]),c_double(huntercmd[1]),c_double(huntercmd[2]),c_double(huntercmd[3]),\
-                           c_double(0),c_double(0),c_double(0),c_double(0))
+                           c_double(0),c_double(0),c_double(0),c_double(0),\
+                           c_ulonglong(period))
+
 
 
 def siminfo():
@@ -202,7 +202,7 @@ if __name__ == "__main__":
     from scipy import linalg as la
     import time
 
-    siminit(int(1e9/100),[1,2,0],[0,0,180],[4,6,0],[0,0,0],5,10,180,180)
+    siminit([1,2,0],[0,0,180],[4,6,0],[0,0,0],5,10,180,180)
     renderer = visualdrone()
     it = 0
 
@@ -217,7 +217,7 @@ if __name__ == "__main__":
         #simcontrol([roll,pitch,yaw,throttle],[roll,pitch,yaw,throttle])
         
  
-        simrun([0,0,0,0],[0,0,0,0])
+        simrun(5000000,[0,0,0,0],[0,0,0,0])
         pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo()
        
 

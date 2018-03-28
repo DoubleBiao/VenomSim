@@ -20,7 +20,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <time.h>
 #include <chrono>
 
-#include "lag.hpp"
 #include "main_config.h"
 #include "quadcopter.h"
 
@@ -36,19 +35,10 @@ quadcopter * Quadcopter_target;
 infoformat * outputbuffer;
 imagecoor * uwcoor;
 
-
-unsigned long long _period;
-
-senselag lagofsensor;
-controllag lagofctrl;
-cmdformat latestcmd = {0,0,0,0,  0,0,0,0};
-
-
 //init interface 
 extern "C" void siminit(double initx, double inity, double initz, double initroll, double initpitch, double inityaw,
-			double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t, double speed_upbound_hunter,double speed_upbound_target,
-                        double yawdot_bound, double yawdot_bound_t,
-			unsigned long long period,unsigned long long sensingdelay, unsigned long long ctrldelay)
+											 double initx_t, double inity_t, double initz_t, double initroll_t, double initpitch_t, double inityaw_t, double speed_upbound_hunter,double speed_upbound_target,
+                        double yawdot_bound, double yawdot_bound_t)
 {
 	if(Quadcopter_sim != nullptr)  delete Quadcopter_sim;
 	if(Quadcopter_target != nullptr) delete Quadcopter_target;
@@ -59,32 +49,17 @@ extern "C" void siminit(double initx, double inity, double initz, double initrol
 
 	Quadcopter_target = new quadcopter;
 	Quadcopter_target->startSimulation(initx_t,inity_t,initz_t,initroll_t,initpitch_t,inityaw_t,speed_upbound_target,yawdot_bound_t);
-
-        _period = period;
-
-	lagofsensor = senselag((int)_period/samplingperiod,(int)sensingdelay/samplingperiod);
-	lagofctrl   = controllag((int)_period/samplingperiod,(int)ctrldelay/samplingperiod);
-	
-	//for(int i = 0; i < 5 ; i++) lagofsensor.readinfo(Quadcopter_sim,Quadcopter_target);
-	while(!lagofsensor.bufferfull()) lagofsensor.readinfo(Quadcopter_sim,Quadcopter_target,true);
-	lagofsensor.outputinfo(outputbuffer);
-
-	std::cout<<"digital period:"<<(int)_period/samplingperiod<<std::endl;
 }
 
 
 //run interface 
 extern "C" void simrun(double roll, double pitch, double yaw, double throttle,
-		       double roll_t, double pitch_t, double yaw_t, double throttle_t)
+		       double roll_t, double pitch_t, double yaw_t, double throttle_t,
+                       unsigned long long period)
 {
-    unsigned long long simspan = _period;
-    lagofctrl.readcmd(roll,pitch,yaw,throttle, roll_t, pitch_t, yaw_t, throttle_t);
-    int digitaltime = 0;
-    
+    unsigned long long simspan = period;
     while(simspan > samplingperiod)
     {
-	if(lagofctrl.behavetriggerd(digitaltime)) latestcmd = lagofctrl.carryoutcmd();
-
         Quadcopter_sim->getcommands(roll,pitch,yaw,throttle);
         Quadcopter_sim->dosimulating(QS_TIME_DELTA,samplingperiod);
 
@@ -93,11 +68,6 @@ extern "C" void simrun(double roll, double pitch, double yaw, double throttle,
 
 
         simspan -= samplingperiod;
-        if(lagofsensor.behavetriggerd(digitaltime)) lagofsensor.readinfo(Quadcopter_sim,Quadcopter_target,false);
-
-        digitaltime ++;
-
-
     }
     if(simspan > 0)
     {
@@ -107,16 +77,12 @@ extern "C" void simrun(double roll, double pitch, double yaw, double throttle,
         Quadcopter_target->getcommands(roll_t,pitch_t,yaw_t,throttle_t);
         Quadcopter_target->dosimulating(simspan,simspan);
     }
-
-    lagofsensor.outputinfo(outputbuffer);
 }
 
 //fetchinfo interface
 extern "C" infoformat * siminfo()
 {
-
-
-	/*outputbuffer->posx = Quadcopter_sim->get_position(0);
+	outputbuffer->posx = Quadcopter_sim->get_position(0);
 	outputbuffer->posy = Quadcopter_sim->get_position(1);
 	outputbuffer->posz = Quadcopter_sim->get_position(2);
 
@@ -148,7 +114,7 @@ extern "C" infoformat * siminfo()
 	outputbuffer->accy_t = Quadcopter_target->get_acc(1);
 	outputbuffer->accz_t = Quadcopter_target->get_acc(2);
 
-	outputbuffer->thrust = Quadcopter_sim->get_thrust();*/
+	outputbuffer->thrust = Quadcopter_sim->get_thrust();
 	//std::cout<<outputbuffer->posx<<outputbuffer->posy<<outputbuffer->posz<<std::endl;
 
 	return outputbuffer;

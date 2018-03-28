@@ -52,21 +52,6 @@ class quadcopter
 		quadcopterImpl* qcimpl;
 };
 
-struct cmdformat
-{
-	double roll_h;
-	double pitch_h;
-	double yaw_h;
-	double thrust_h;
-
-	double roll_t;
-	double pitch_t;
-	double yaw_t;
-	double thrust_t;
-};
-
-
-
 struct infoformat
 {
 	double posx;
