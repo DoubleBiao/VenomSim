@@ -26,14 +26,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "camera.hpp"
+#include "virtulvision.hpp"
 
 const unsigned long long samplingperiod = 1e9/360;
 
 quadcopter * Quadcopter_sim;
 quadcopter * Quadcopter_target;
 infoformat * outputbuffer;
-imagecoor * uwcoor;
+
 
 //init interface 
 extern "C" void siminit(double initx, double inity, double initz, double initroll, double initpitch, double inityaw,
@@ -121,6 +121,57 @@ extern "C" infoformat * siminfo()
 }
 
 
+
+
+
+
+
+imagecoor * uwcoor;
+virtulvision projector;
+
+extern "C" void installcamera(double roll, double pitch, double yaw,
+                                double FOVleft, double FOVright, double FOVbottom, double FOVtop, double FOVnear, double FOVfar,
+				double screenwidth, double screenheight)
+{
+	projector.loaddrone("simpledrone.obj");
+	projector.installcamera(roll,pitch,yaw,
+			FOVleft,FOVright,FOVbottom,FOVtop,FOVnear,FOVfar,
+			screenwidth,screenheight);
+
+	if(uwcoor == nullptr) uwcoor = new imagecoor; 
+
+
+	//std::cout<<"in installcamera:\n"<<std::endl;
+	//std::cout<<"camori:"<<roll<<","<<pitch<<","<<yaw<<std::endl;
+	//std::cout<<"frustum:"<<FOVleft<<","<<FOVright<<","<<FOVbottom<<","<<FOVtop<<","<<FOVnear<<","<<FOVfar<<std::endl;
+	//std::cout<<"screen size"<<screenwidth<<","<<screenheight<<std::endl;
+
+}
+
+extern "C" imagecoor * simprojection(
+                              double hx,double hy, double hz, double hroll, double hpitch,double hyaw,
+                              double tx,double ty, double tz, double troll, double tpitch,double tyaw)
+{
+
+	//std::cout<<"in simprojection:\n"<<std::endl;
+	//std::cout<<"hunter position: "<<hx<<","<<hy<<","<<hz<<std::endl;
+	//std::cout<<"hunter orientation: "<<hroll<<","<<hpitch<<","<<hyaw<<std::endl;
+	//std::cout<<"target position: "<<tx<<","<<ty<<","<<tz<<std::endl;
+	//std::cout<<"target orientation: "<<troll<<","<<tpitch<<","<<tyaw<<std::endl;
+
+
+
+	projector.seedrone(hx,hy,hz,hroll,hpitch,hyaw,
+	tx,ty,tz,troll,tpitch,tyaw,
+	uwcoor);
+
+	//std::cout<<"out data:\n"<<std::endl;
+	//std::cout<<uwcoor->u<<","<<uwcoor->v<<","<<uwcoor->w<<","<<uwcoor->area<<std::endl;
+
+	return uwcoor;
+}
+
+
 //release interface
 extern "C" void simstop()
 {
@@ -136,46 +187,3 @@ extern "C" void simstop()
         uwcoor = nullptr;
 }
 
-
-dronecamera cam(glm::vec3(0.0f,0.0f,0.0f));
-
-extern "C" void installcamera(double roll, double pitch, double yaw,
-                              double FOVleft, double FOVright, double FOVbottom, double FOVtop, double FOVnear, double FOVfar)
-{
-	if(uwcoor == nullptr) uwcoor = new imagecoor; 
-	cam = dronecamera(roll,pitch,yaw);
-        cam.setfrustum(FOVleft, FOVright, FOVbottom, FOVtop, FOVnear, FOVfar);
-
-}
-
-
-extern "C" imagecoor * simprojection(double hx,double hy, double hz, double hroll, double hpitch, double hyaw,
-                              double tx,double ty, double tz,
-                              double width,double height)
-{
-    using namespace glm;
-    using namespace std;
-    //cout<<hx<<" "<<hy<<" "<<hz<<endl;
-    //cout<<hroll<<" "<<hpitch<<" "<<hyaw<<endl;
-    //cout<<tx<<" "<<ty<<" "<<tz<<endl;
-
-
-    mat4 model(1.0f);
-    model = cam.getviewpoint(glm::vec3(hx,hy,hz),glm::vec3(hroll,hpitch,hyaw))*model;
-    
-    mat4 projection = cam.getfrustum();//frustum(-0.01f, 0.01f, -0.01f, 0.01f, 0.01f, 500.0f);
-
-    vec4 viewport(0.0f, 0.0f, width, height);
-    vec3 original(tx, ty, tz);
-    
-    vec3 out2 = glm::project(original, model, projection, viewport);
-    uwcoor->u = out2[0];
-    uwcoor->v = out2[1];
-    uwcoor->w = out2[2];
-
-
-    //cout<<out2[0]<<","<<out2[1]<<","<<out2[2]<<endl;
-
-    return uwcoor;
-       
-}

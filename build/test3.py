@@ -1,10 +1,16 @@
 from dronesim import *
 
-#siminit([-10,0,0],[0,0,0],[0,0,0],[0,0,0],5,10)
-#frustum = [-0.02, 0.02, ]
-installcamera([0,0,180],110,63, 0.01, 500.0)
+hunterpos = [0,-2,-2]
+hunterori = [180,0,0]
+targetpos = [0,0,0]
+targetori = [-45,0,45]
 
-u,v,t = projection([0,0,0],[0,0,0],[0.01,0.022082516790052263,0.03462007361006086],600,800)
 
-print (u,v,t)
+
+installcamera([45,0,90],80,80, 0.01, 100.0,400.0,300.0)
+
+
+u,w,area,inscreen = projection(hunterpos,hunterori,targetpos,targetori)
+
+print(u,w,area,inscreen )
 
