@@ -110,7 +110,7 @@ void virtulvision::seedrone(float hx,float hy, float hz, float hroll, float hpit
 	insightarea /= ondronecam.getscreenarea();
 
 	glm::vec3 projectedcenter;
-	this->ondronecam.project(glm::vec3(tx,ty,tz),projectedcenter);
+	this->ondronecam.project(glm::vec3(0,0,0),projectedcenter);
 
 	outputinfo->u = projectedcenter[0];
 	outputinfo->v = projectedcenter[1];
