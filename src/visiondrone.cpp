@@ -398,6 +398,8 @@ bool loadcubes( const char * path, std::vector<cubecoord> & cubecontours)
 	for(int i = 0 ; i < 5; i ++)
 		cubecontours[i] = cubecoord(cubes[i],temp_vertices,temp_normals);
 
+	fclose(file);
+
 	return true;
 }
 
