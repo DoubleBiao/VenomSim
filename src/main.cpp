@@ -175,10 +175,10 @@ extern "C" imagecoor * simprojection(
 //release interface
 extern "C" void simstop()
 {
-	delete Quadcopter_sim;
-	delete Quadcopter_target;
-	delete outputbuffer;
-        if(uwcoor!= nullptr) delete uwcoor;
+	if(Quadcopter_sim!= nullptr)     delete Quadcopter_sim;
+	if(Quadcopter_target != nullptr) delete Quadcopter_target;
+	if(outputbuffer != nullptr )     delete outputbuffer;
+        if(uwcoor!= nullptr)             delete uwcoor;
 
 
        	outputbuffer = nullptr;
