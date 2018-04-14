@@ -78,13 +78,15 @@ def siminfo():
     pos_hunter = np.array([outinfo.contents.posx,outinfo.contents.posy,outinfo.contents.posz])
     ori_hunter = np.array([outinfo.contents.thetax,outinfo.contents.thetay,outinfo.contents.thetaz])
     acc_hunter = np.array([outinfo.contents.accx,outinfo.contents.accy,outinfo.contents.accz])
-    
+    spd_hunter = np.array([outinfo.contents.velocityx,outinfo.contents.velocityy,outinfo.contents.velocityz])    
+
+
     pos_target = np.array([outinfo.contents.posx_t,outinfo.contents.posy_t,outinfo.contents.posz_t])
     ori_target = np.array([outinfo.contents.thetax_t,outinfo.contents.thetay_t,outinfo.contents.thetaz_t])
     acc_target = np.array([outinfo.contents.accx_t,outinfo.contents.accy_t,outinfo.contents.accz_t])
-
+    spd_target = np.array([outinfo.contents.velocityx_t,outinfo.contents.velocityy_t,outinfo.contents.velocityz_t]) 
     
-    return pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,outinfo.contents.thrust
+    return pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,outinfo.contents.thrust,spd_hunter,spd_target
 
 def projection(pos_hunter,ori_hunter,pos_target,ori_target):
     outcoor = dronesimapi.simprojection(c_double(pos_hunter[0]),c_double(pos_hunter[1]),c_double(pos_hunter[2]),\
@@ -215,12 +217,11 @@ if __name__ == "__main__":
 
 
     #print(u,v)
-    for t in range(10000):
+    for t in range(1000):
         roll,pitch,yaw,throttle = cmdfromkeyboard() 
-        simrun(5000000,[0,0,0,0],[0,0,0,0])
-        pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust = siminfo()
-       
-
+        simrun(5000000,[0,0,0,1],[0,0,0,0])
+        pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust,spd_hunter,spd_target = siminfo()
+        print(spd_hunter,spd_target)
         if it%30 == 0:
             renderer.render(pos_hunter,ori_hunter,pos_target,ori_target)
             print(pos_hunter[0],pos_hunter[1],pos_hunter[2])

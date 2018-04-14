@@ -12,7 +12,7 @@ def actiongenerator():
 env = DroneSimEnv()
 drone_render = dronerender.dronerender()
 
-itetime = 1000
+itetime = 5www
 
 fig = plt.figure()
 #ax = fig.add_subplot(111)
