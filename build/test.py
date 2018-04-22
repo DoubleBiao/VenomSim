@@ -1,21 +1,16 @@
-from DroneSimEnv import *
-import random
-import time
+from dronesim import *
 
+siminit([1,2,0],[0,0,180],[4,6,0],[0,0,0],5,10,180,180)  # init simulation session
+renderer = visualdrone()                                 # init visulization
+it = 0
 
-def actiongenerator():
-    return [random.random(),random.random(),random.random(),random.random()]
+for t in range(1000):
+    simrun(5000000,[0,0,0,1])                 # run a step of simulation
+    pos_hunter,ori_hunter,acc_hunter,pos_target,ori_target,acc_target,thrust,spd_hunter,spd_target = siminfo() # fetch the data
+    print(spd_hunter,spd_target)
+    if it%30 == 0:
+        renderer.render(pos_hunter,ori_hunter,pos_target,ori_target)
+        print(pos_hunter[0],pos_hunter[1],pos_hunter[2])
+    it+=1
+dronesimapi.simstop()                           # stop the simulation
 
-
-env = DroneSimEnv()
-itetime = 1000
-
-for i in range(itetime):
-    state, reward, done, dis = env.step([1,0,0,1])
-    print("reward: ",reward)
-    print("done: ",done)
-    print("distance: ",dis['distance'])
-    
-    time.sleep(0.01)
-
-env.stop()
